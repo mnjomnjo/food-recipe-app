@@ -41,3 +41,12 @@
   border-radius: 5px;
   border: 1px solid #ccc;
 }
+.filter-buttons {
+  margin-bottom: 20px;
+}
+
+.filter-buttons button {
+  margin: 5px;
+  padding: 8px 12px;
+  cursor: pointer;
+}

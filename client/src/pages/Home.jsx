@@ -9,6 +9,7 @@ function Home() {
   ]);
 
   const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("all");
 
   return (
     <div className="home-container">
@@ -22,11 +23,26 @@ function Home() {
         onChange={(e) => setSearch(e.target.value)}
       />
 
+      {/* 🔥 Filter */}
+      <div className="filter-buttons">
+        <button onClick={() => setFilter("all")}>All</button>
+        <button onClick={() => setFilter("low")}>Low</button>
+        <button onClick={() => setFilter("medium")}>Medium</button>
+        <button onClick={() => setFilter("high")}>High</button>
+      </div>
+
       <div className="recipes-grid">
         {recipes
           .filter((recipe) =>
             recipe.title.toLowerCase().includes(search.toLowerCase())
           )
+          .filter((recipe) => {
+            if (filter === "low") return recipe.calories < 200;
+            if (filter === "medium")
+              return recipe.calories >= 200 && recipe.calories <= 400;
+            if (filter === "high") return recipe.calories > 400;
+            return true;
+          })
           .map((recipe) => (
             <div key={recipe._id} className="card">
               <h3>{recipe.title}</h3>
