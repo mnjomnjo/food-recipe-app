@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 import "./Login.css";
 
 function Register() {
@@ -31,22 +32,29 @@ function Register() {
         <input
           type="text"
           placeholder="Username"
+          value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
 
         <input
           type="email"
           placeholder="Email"
+          value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
 
         <input
           type="password"
           placeholder="Password"
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
 
         <button type="submit">Register</button>
+
+        <p>
+          Already have an account? <Link to="/">Login</Link>
+        </p>
       </form>
     </div>
   );
