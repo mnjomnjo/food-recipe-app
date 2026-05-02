@@ -4,6 +4,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const verifyToken = require("./middleware/authMiddleware");
 
 // Initialize Express app
 const app = express();
@@ -17,6 +18,14 @@ app.use(express.json()); // Parse JSON request bodies
 
 // Routes
 app.use("/api/auth", authRoute); // Authentication routes
+
+// Protected route (only logged-in users can access)
+app.get("/api/protected", verifyToken, (req, res) => {
+  res.json({
+    message: "You are authorized",
+    user: req.user,
+  });
+});
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
