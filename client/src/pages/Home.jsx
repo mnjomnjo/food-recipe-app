@@ -1,38 +1,24 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useState } from "react";
+import "./Home.css";
 
 function Home() {
-  const [recipes, setRecipes] = useState([]);
-
-  useEffect(() => {
-    fetchRecipes();
-  }, []);
-
-  const fetchRecipes = async () => {
-    try {
-      const res = await axios.get("http://localhost:5000/recipes");
-      setRecipes(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const [recipes] = useState([
+    { _id: 1, title: "Chicken", calories: 300 },
+    { _id: 2, title: "Salad", calories: 150 },
+    { _id: 3, title: "Pasta", calories: 500 },
+  ]);
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="home-container">
       <h2>Recipes</h2>
 
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
+      <div className="recipes-grid">
         {recipes.map((recipe) => (
-          <div
-            key={recipe._id}
-            style={{
-              border: "1px solid #ccc",
-              padding: "10px",
-              width: "200px",
-            }}
-          >
-            <h4>{recipe.title}</h4>
-            <p>Calories: {recipe.calories}</p>
+          <div key={recipe._id} className="card">
+            <h3>{recipe.title}</h3>
+            <p>{recipe.calories} Calories</p>
+
+            <button className="fav-btn">❤️</button>
           </div>
         ))}
       </div>
