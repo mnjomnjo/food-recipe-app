@@ -11,6 +11,26 @@ function Home() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
 
+  // ⭐ Ratings state
+  const [ratings, setRatings] = useState({});
+
+  // ❤️ Favorites state
+  const [favorites, setFavorites] = useState([]);
+
+  // ⭐ handle rating
+  const handleRating = (id, rating) => {
+    setRatings({ ...ratings, [id]: rating });
+  };
+
+  // ❤️ toggle favorite
+  const toggleFavorite = (id) => {
+    if (favorites.includes(id)) {
+      setFavorites(favorites.filter((fav) => fav !== id));
+    } else {
+      setFavorites([...favorites, id]);
+    }
+  };
+
   return (
     <div className="home-container">
       <h2>Recipes</h2>
@@ -48,7 +68,33 @@ function Home() {
               <h3>{recipe.title}</h3>
               <p>{recipe.calories} Calories</p>
 
-              <button className="fav-btn">❤️</button>
+              {/* ❤️ Favorites */}
+              <button
+                className="fav-btn"
+                onClick={() => toggleFavorite(recipe._id)}
+                style={{
+                  color: favorites.includes(recipe._id) ? "red" : "black",
+                }}
+              >
+                ❤️
+              </button>
+
+              {/* ⭐ Rating */}
+              <div className="rating">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <span
+                    key={star}
+                    onClick={() => handleRating(recipe._id, star)}
+                    style={{
+                      cursor: "pointer",
+                      color:
+                        ratings[recipe._id] >= star ? "gold" : "gray",
+                    }}
+                  >
+                    ★
+                  </span>
+                ))}
+              </div>
             </div>
           ))}
       </div>
