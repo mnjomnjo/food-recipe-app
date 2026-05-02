@@ -3,9 +3,10 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 
-// Register route
+// ================= REGISTER =================
 router.post("/register", async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -16,17 +17,18 @@ router.post("/register", async (req, res) => {
       return res.status(400).json("User already exists");
     }
 
-    // Hash password
+    // Generate salt and hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create user
+    // Create new user with hashed password
     const newUser = new User({
       username,
       email,
       password: hashedPassword,
     });
 
+    // Save user to database
     await newUser.save();
 
     res.status(201).json("User created successfully");
@@ -36,7 +38,7 @@ router.post("/register", async (req, res) => {
 });
 
 
-// Login route (❗ خارج register)
+// ================= LOGIN =================
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -47,16 +49,29 @@ router.post("/login", async (req, res) => {
       return res.status(400).json("User not found");
     }
 
-    // Compare password
+    // Compare entered password with hashed password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json("Invalid credentials");
     }
 
-    res.status(200).json("Login successful");
+    // Create JWT token (user identity)
+    const token = jwt.sign(
+      { id: user._id },              // payload (user ID)
+      process.env.JWT_SECRET,        // secret key
+      { expiresIn: "1d" }            // token expiration
+    );
+
+    // Send response with token
+    res.status(200).json({
+      message: "Login successful",
+      token: token,
+    });
+
   } catch (err) {
     res.status(500).json(err);
   }
 });
+
 
 module.exports = router;
