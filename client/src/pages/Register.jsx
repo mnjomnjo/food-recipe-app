@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import "./Login.css";
+import "./Auth.css";
 
 function Register() {
   const [username, setUsername] = useState("");
@@ -19,43 +19,52 @@ function Register() {
       });
 
       alert("Registered successfully!");
+      window.location.href = "/";
     } catch (err) {
       alert("Registration failed");
     }
   };
 
   return (
-    <div className="login-container">
-      <form className="login-box" onSubmit={handleRegister}>
-        <h2>Register</h2>
+    <div className="auth-container">
+      {/* LEFT */}
+      <div className="left-panel">
+        <h1 className="app-name"> MyRecipes</h1>
 
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
+        <h2>Hello, Friend!</h2>
+        <p>Create your account and start cooking</p>
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        <Link to="/">
+          <button className="ghost-btn">Sign In</button>
+        </Link>
+      </div>
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+      {/* RIGHT */}
+      <div className="right-panel">
+        <form onSubmit={handleRegister} className="form-box">
+          <h2>Register</h2>
 
-        <button type="submit">Register</button>
+          <input
+            type="text"
+            placeholder="Username"
+            onChange={(e) => setUsername(e.target.value)}
+          />
 
-        <p>
-          Already have an account? <Link to="/">Login</Link>
-        </p>
-      </form>
+          <input
+            type="email"
+            placeholder="Email"
+            onChange={(e) => setEmail(e.target.value)}
+          />
+
+          <input
+            type="password"
+            placeholder="Password"
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
+          <button type="submit">Sign Up</button>
+        </form>
+      </div>
     </div>
   );
 }

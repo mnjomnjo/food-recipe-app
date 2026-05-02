@@ -1,13 +1,14 @@
+/* GLOBAL */
 .auth-container {
   display: flex;
   height: 100vh;
-  font-family: Arial, sans-serif;
+  font-family: 'Poppins', sans-serif;
 }
 
-/* LEFT SIDE */
+/* LEFT PANEL */
 .left-panel {
   flex: 1;
-  background: linear-gradient(135deg, #ba6a0f, #38f9d7);
+  background: linear-gradient(135deg, #ec560a, #66d3e7);
   color: white;
   padding: 60px;
   position: relative;
@@ -16,58 +17,118 @@
   justify-content: center;
 }
 
+/*  APP NAME */
 .app-name {
   position: absolute;
-  top: 60px;
-  left: 70px;
-  font-weight: bold;
+  top: 25px;
+  left: 35px;
+
+  font-size: 75px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+
+  font-family: 'Montserrat', sans-serif; 
+
+  background: linear-gradient(45deg, #ffffff, #ffe6d5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  text-shadow: 0 3px 10px rgba(0,0,0,0.2);
 }
 
+/* TEXT */
 .left-panel h2 {
-  font-size: 32px;
+  font-size: 36px;
+  margin-bottom: 10px;
 }
 
 .left-panel p {
-  margin: 10px 0 20px;
+  margin-bottom: 20px;
+  opacity: 0.9;
+  line-height: 1.5;
 }
 
+/* BUTTON (LEFT) */
 .ghost-btn {
   background: transparent;
   border: 2px solid white;
-  padding: 10px 20px;
+  padding: 10px 25px;
   color: white;
   cursor: pointer;
-  border-radius: 20px;
+  border-radius: 25px;
+  transition: all 0.3s ease;
 }
 
-/* RIGHT SIDE */
+.ghost-btn:hover {
+  background: white;
+  color: #ff5e62;
+}
+
+/* RIGHT PANEL */
 .right-panel {
   flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #f5f5f5;
+  background: #f8f9fb;
 }
 
+/* FORM CARD */
 .form-box {
   background: white;
   padding: 40px;
-  border-radius: 10px;
-  width: 300px;
+  border-radius: 15px;
+  width: 320px;
   text-align: center;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+  animation: fadeIn 0.6s ease;
 }
 
+.form-box h2 {
+  margin-bottom: 20px;
+}
+
+/* INPUT */
 .form-box input {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  transition: all 0.3s ease;
 }
 
+.form-box input:focus {
+  border-color: #ff5e62;
+  outline: none;
+  box-shadow: 0 0 5px rgba(255, 94, 98, 0.3);
+}
+
+/* BUTTON (RIGHT) */
 .form-box button {
   width: 100%;
-  padding: 10px;
-  background: #e9ba43;
+  padding: 12px;
+  background: linear-gradient(135deg, #ff9966, #ff5e62);
   border: none;
   color: white;
   cursor: pointer;
+  border-radius: 8px;
+  margin-top: 10px;
+  transition: 0.3s;
+}
+
+.form-box button:hover {
+  opacity: 0.9;
+}
+
+/* ANIMATION */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
