@@ -18,9 +18,26 @@
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
+.card:hover {
+  transform: scale(1.05);
+  transition: 0.3s;
+}
+
 .fav-btn {
   background: none;
   border: none;
   font-size: 20px;
   cursor: pointer;
+}
+
+.fav-btn:hover {
+  color: red;
+}
+
+.home-container input {
+  padding: 10px;
+  width: 250px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
 }
