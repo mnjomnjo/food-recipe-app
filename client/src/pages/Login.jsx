@@ -17,7 +17,7 @@ function Login() {
       });
 
       localStorage.setItem("token", res.data.token);
-      alert("Login successful!");
+      window.location.href = "/home";      
     } catch (err) {
       alert("Login failed");
     }
