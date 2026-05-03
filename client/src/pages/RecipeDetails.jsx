@@ -1,11 +1,23 @@
 import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import Navbar from "../components/Navbar";
 import "./RecipeDetails.css";
 
 function RecipeDetails() {
   const { id } = useParams();
 
-  // (Home)
-  const recipes = [
+  const [favorites, setFavorites] = useState([]);
+
+  //  LOAD FAVORITES
+  useEffect(() => {
+    const storedFav = JSON.parse(localStorage.getItem("favorites")) || [];
+    setFavorites(storedFav);
+  }, []);
+
+  //  DATA (same as Home + localStorage)
+  const storedRecipes = JSON.parse(localStorage.getItem("recipes")) || [];
+
+  const defaultRecipes = [
     {
       _id: 1,
       title: "Chicken",
@@ -32,22 +44,67 @@ function RecipeDetails() {
     },
   ];
 
+  const recipes = [...storedRecipes, ...defaultRecipes];
+
   const recipe = recipes.find((r) => r._id === Number(id));
 
   if (!recipe) return <h2>Recipe not found</h2>;
 
+  //  FAVORITE LOGIC
+  const toggleFavorite = (id) => {
+    let updated;
+
+    if (!favorites.includes(id)) {
+      const confirmAdd = window.confirm(
+        "Add this recipe to favorites?"
+      );
+      if (!confirmAdd) return;
+    }
+
+    if (favorites.includes(id)) {
+      updated = favorites.filter((fav) => fav !== id);
+    } else {
+      updated = [...favorites, id];
+    }
+
+    setFavorites(updated);
+    localStorage.setItem("favorites", JSON.stringify(updated));
+  };
+
   return (
-    <div className="details-container">
-      <img src={recipe.image} alt={recipe.title} />
+    <>
+      <Navbar />
 
-      <h1>{recipe.title}</h1>
+      <div className="details-container">
+        <img
+          src={
+            recipe.image ||
+            "https://via.placeholder.com/300x200?text=No+Image"
+          }
+          alt={recipe.title}
+        />
 
-      <p>{recipe.calories} Calories</p>
+        <h1>{recipe.title}</h1>
 
-      <p className="desc">{recipe.description}</p>
+        <p>{recipe.calories} Calories</p>
 
-      <button className="fav-btn">❤️ Add to Favorites</button>
-    </div>
+        <p className="desc">{recipe.description}</p>
+
+        <button
+          className="fav-btn"
+          onClick={() => toggleFavorite(recipe._id)}
+          style={{
+            background: favorites.includes(recipe._id)
+              ? "#ff4d4d"
+              : "#ff7a7a",
+          }}
+        >
+          {favorites.includes(recipe._id)
+            ? "❤️ Remove from Favorites"
+            : "❤️ Add to Favorites"}
+        </button>
+      </div>
+    </>
   );
 }
 

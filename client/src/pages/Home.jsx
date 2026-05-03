@@ -12,8 +12,10 @@ function Home() {
   const [ratings, setRatings] = useState({});
   const [favorites, setFavorites] = useState([]);
 
+  // LOAD DATA
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("recipes")) || [];
+    const storedRecipes = JSON.parse(localStorage.getItem("recipes")) || [];
+    const storedFav = JSON.parse(localStorage.getItem("favorites")) || [];
 
     const defaultRecipes = [
       {
@@ -39,23 +41,41 @@ function Home() {
       },
     ];
 
-    setRecipes([...stored, ...defaultRecipes]);
+    setRecipes([...storedRecipes, ...defaultRecipes]);
+    setFavorites(storedFav);
   }, []);
 
+  //  RATING
   const handleRating = (id, rating) => {
     setRatings({ ...ratings, [id]: rating });
   };
 
+  // FAVORITE + CONFIRM
   const toggleFavorite = (id) => {
-    if (favorites.includes(id)) {
-      setFavorites(favorites.filter((fav) => fav !== id));
-    } else {
-      setFavorites([...favorites, id]);
+    let updated;
+
+    if (!favorites.includes(id)) {
+      const confirmAdd = window.confirm(
+        "Add this recipe to favorites?"
+      );
+      if (!confirmAdd) return;
     }
+
+    if (favorites.includes(id)) {
+      updated = favorites.filter((fav) => fav !== id);
+    } else {
+      updated = [...favorites, id];
+    }
+
+    setFavorites(updated);
+    localStorage.setItem("favorites", JSON.stringify(updated));
   };
 
-  //  DELETE RECIPE
+  // DELETE
   const deleteRecipe = (id) => {
+    const confirmDelete = window.confirm("Delete this recipe?");
+    if (!confirmDelete) return;
+
     const updated = recipes.filter((r) => r._id !== id);
     setRecipes(updated);
 
@@ -129,7 +149,6 @@ function Home() {
                 className="card"
                 onClick={() => navigate(`/recipe/${recipe._id}`)}
               >
-                {/*  FALLBACK IMAGE */}
                 <img
                   src={
                     recipe.image ||
@@ -141,7 +160,7 @@ function Home() {
                 <h3>{recipe.title}</h3>
                 <p>{recipe.calories} Calories</p>
 
-                {/*  FAVORITE */}
+                {/* FAVORITE */}
                 <button
                   className="fav-btn"
                   onClick={(e) => {
@@ -157,7 +176,7 @@ function Home() {
                   ❤️
                 </button>
 
-                {/*  RATING */}
+                {/* RATING */}
                 <div className="rating">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <span
@@ -177,7 +196,7 @@ function Home() {
                   ))}
                 </div>
 
-                {/*  DELETE */}
+                {/* DELETE */}
                 <button
                   className="delete-btn"
                   onClick={(e) => {

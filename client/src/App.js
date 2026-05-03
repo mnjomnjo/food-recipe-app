@@ -3,7 +3,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
 import RecipeDetails from "./pages/RecipeDetails";
-import AddRecipe from "./pages/AddRecipe"; //  NEW
+import AddRecipe from "./pages/AddRecipe";
+import Favorites from "./pages/Favorites"; //  NEW
 
 function App() {
   return (
@@ -13,11 +14,11 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/home" element={<Home />} />
 
-        {/* Recipe Details */}
         <Route path="/recipe/:id" element={<RecipeDetails />} />
-
-        {/* Add Recipe */}
         <Route path="/add" element={<AddRecipe />} />
+
+        {/*  Favorites */}
+        <Route path="/favorites" element={<Favorites />} />
       </Routes>
     </Router>
   );
