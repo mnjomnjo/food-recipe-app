@@ -1,15 +1,18 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import "./Home.css";
 
 function Home() {
+  const navigate = useNavigate();
+
   const [recipes] = useState([
     {
       _id: 1,
       title: "Chicken",
       calories: 300,
       image:
-      "https://i0.wp.com/magic-stores.com/wp-content/uploads/2021/05/%D9%81%D8%B1%D9%88%D8%AC-%D9%85%D8%B4%D9%88%D9%8A.png?resize=600%2C400&ssl=1",
+        "https://i0.wp.com/magic-stores.com/wp-content/uploads/2021/05/%D9%81%D8%B1%D9%88%D8%AC-%D9%85%D8%B4%D9%88%D9%8A.png?resize=600%2C400&ssl=1",
     },
     {
       _id: 2,
@@ -110,7 +113,11 @@ function Home() {
               return true;
             })
             .map((recipe) => (
-              <div key={recipe._id} className="card">
+              <div
+                key={recipe._id}
+                className="card"
+                onClick={() => navigate(`/recipe/${recipe._id}`)}
+              >
                 <img src={recipe.image} alt={recipe.title} />
 
                 <h3>{recipe.title}</h3>
@@ -119,7 +126,10 @@ function Home() {
                 {/*  FAVORITE */}
                 <button
                   className="fav-btn"
-                  onClick={() => toggleFavorite(recipe._id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleFavorite(recipe._id);
+                  }}
                   style={{
                     color: favorites.includes(recipe._id)
                       ? "red"
@@ -134,7 +144,10 @@ function Home() {
                   {[1, 2, 3, 4, 5].map((star) => (
                     <span
                       key={star}
-                      onClick={() => handleRating(recipe._id, star)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRating(recipe._id, star);
+                      }}
                       style={{
                         color:
                           ratings[recipe._id] >= star ? "gold" : "#ccc",
