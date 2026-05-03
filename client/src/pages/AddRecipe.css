@@ -1,0 +1,32 @@
+.add-container {
+  padding: 40px;
+  text-align: center;
+}
+
+.add-form {
+  max-width: 400px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.add-form input,
+.add-form textarea {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.add-form button {
+  padding: 12px;
+  background: #ff5e62;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.add-form button:hover {
+  opacity: 0.9;
+}

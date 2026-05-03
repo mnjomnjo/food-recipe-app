@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import "./Home.css";
@@ -6,34 +6,41 @@ import "./Home.css";
 function Home() {
   const navigate = useNavigate();
 
-  const [recipes] = useState([
-    {
-      _id: 1,
-      title: "Chicken",
-      calories: 300,
-      image:
-        "https://i0.wp.com/magic-stores.com/wp-content/uploads/2021/05/%D9%81%D8%B1%D9%88%D8%AC-%D9%85%D8%B4%D9%88%D9%8A.png?resize=600%2C400&ssl=1",
-    },
-    {
-      _id: 2,
-      title: "Salad",
-      calories: 150,
-      image:
-        "https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=800&q=80",
-    },
-    {
-      _id: 3,
-      title: "Pasta",
-      calories: 500,
-      image:
-        "https://images.unsplash.com/photo-1525755662778-989d0524087e?auto=format&fit=crop&w=800&q=80",
-    },
-  ]);
-
+  const [recipes, setRecipes] = useState([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [ratings, setRatings] = useState({});
   const [favorites, setFavorites] = useState([]);
+
+  useEffect(() => {
+    const stored = JSON.parse(localStorage.getItem("recipes")) || [];
+
+    const defaultRecipes = [
+      {
+        _id: 1,
+        title: "Chicken",
+        calories: 300,
+        image:
+          "https://i0.wp.com/magic-stores.com/wp-content/uploads/2021/05/%D9%81%D8%B1%D9%88%D8%AC-%D9%85%D8%B4%D9%88%D9%8A.png?resize=600%2C400&ssl=1",
+      },
+      {
+        _id: 2,
+        title: "Salad",
+        calories: 150,
+        image:
+          "https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=800&q=80",
+      },
+      {
+        _id: 3,
+        title: "Pasta",
+        calories: 500,
+        image:
+          "https://images.unsplash.com/photo-1525755662778-989d0524087e?auto=format&fit=crop&w=800&q=80",
+      },
+    ];
+
+    setRecipes([...stored, ...defaultRecipes]);
+  }, []);
 
   const handleRating = (id, rating) => {
     setRatings({ ...ratings, [id]: rating });
@@ -47,18 +54,27 @@ function Home() {
     }
   };
 
+  //  DELETE RECIPE
+  const deleteRecipe = (id) => {
+    const updated = recipes.filter((r) => r._id !== id);
+    setRecipes(updated);
+
+    const stored = JSON.parse(localStorage.getItem("recipes")) || [];
+    const filteredStored = stored.filter((r) => r._id !== id);
+
+    localStorage.setItem("recipes", JSON.stringify(filteredStored));
+  };
+
   return (
     <>
       <Navbar />
 
       <div className="home-container">
-        {/* HERO */}
         <div className="hero">
           <h1>Discover Recipes </h1>
           <p>Find your favorite meals easily</p>
         </div>
 
-        {/* SEARCH */}
         <div className="search-box">
           <input
             type="text"
@@ -68,7 +84,6 @@ function Home() {
           />
         </div>
 
-        {/* FILTER */}
         <div className="filter-buttons">
           <button
             className={filter === "all" ? "active" : ""}
@@ -76,21 +91,18 @@ function Home() {
           >
             All
           </button>
-
           <button
             className={filter === "low" ? "active" : ""}
             onClick={() => setFilter("low")}
           >
             Low
           </button>
-
           <button
             className={filter === "medium" ? "active" : ""}
             onClick={() => setFilter("medium")}
           >
             Medium
           </button>
-
           <button
             className={filter === "high" ? "active" : ""}
             onClick={() => setFilter("high")}
@@ -99,7 +111,6 @@ function Home() {
           </button>
         </div>
 
-        {/* CARDS */}
         <div className="recipes-grid">
           {recipes
             .filter((recipe) =>
@@ -118,7 +129,14 @@ function Home() {
                 className="card"
                 onClick={() => navigate(`/recipe/${recipe._id}`)}
               >
-                <img src={recipe.image} alt={recipe.title} />
+                {/*  FALLBACK IMAGE */}
+                <img
+                  src={
+                    recipe.image ||
+                    "https://via.placeholder.com/300x200?text=No+Image"
+                  }
+                  alt={recipe.title}
+                />
 
                 <h3>{recipe.title}</h3>
                 <p>{recipe.calories} Calories</p>
@@ -158,6 +176,17 @@ function Home() {
                     </span>
                   ))}
                 </div>
+
+                {/*  DELETE */}
+                <button
+                  className="delete-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteRecipe(recipe._id);
+                  }}
+                >
+                  🗑️
+                </button>
               </div>
             ))}
         </div>

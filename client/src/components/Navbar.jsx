@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import "./Navbar.css";
 
 function Navbar() {
@@ -6,8 +7,9 @@ function Navbar() {
       <h2 className="logo">MyRecipes</h2>
 
       <div className="nav-links">
-        <a href="/home">Home</a>
-        <a href="/favorites">Favorites</a>
+        <Link to="/home">Home</Link>
+        <Link to="/favorites">Favorites</Link>
+        <Link to="/add">Add Recipe</Link> {/*  NEW */}
         <button className="logout-btn">Logout</button>
       </div>
     </nav>

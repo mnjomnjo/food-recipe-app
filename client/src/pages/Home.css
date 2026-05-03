@@ -122,3 +122,11 @@
 .rating span:hover {
   transform: scale(1.3);
 }
+
+.delete-btn {
+  margin-top: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+}
