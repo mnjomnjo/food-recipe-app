@@ -50,14 +50,12 @@ function Home() {
     setRatings({ ...ratings, [id]: rating });
   };
 
-  // FAVORITE + CONFIRM
+  //  FAVORITE
   const toggleFavorite = (id) => {
     let updated;
 
     if (!favorites.includes(id)) {
-      const confirmAdd = window.confirm(
-        "Add this recipe to favorites?"
-      );
+      const confirmAdd = window.confirm("Add this recipe to favorites?");
       if (!confirmAdd) return;
     }
 
@@ -71,7 +69,7 @@ function Home() {
     localStorage.setItem("favorites", JSON.stringify(updated));
   };
 
-  // DELETE
+  //  DELETE
   const deleteRecipe = (id) => {
     const confirmDelete = window.confirm("Delete this recipe?");
     if (!confirmDelete) return;
@@ -85,6 +83,16 @@ function Home() {
     localStorage.setItem("recipes", JSON.stringify(filteredStored));
   };
 
+  //  STATISTICS
+  const totalRecipes = recipes.length;
+
+  const avgCalories =
+    recipes.length > 0
+      ? Math.round(
+          recipes.reduce((sum, r) => sum + r.calories, 0) / recipes.length
+        )
+      : 0;
+
   return (
     <>
       <Navbar />
@@ -93,6 +101,19 @@ function Home() {
         <div className="hero">
           <h1>Discover Recipes </h1>
           <p>Find your favorite meals easily</p>
+        </div>
+
+        {/*  STATISTICS */}
+        <div className="stats">
+          <div className="stat-box">
+            <h3>{totalRecipes}</h3>
+            <p>Total Recipes</p>
+          </div>
+
+          <div className="stat-box">
+            <h3>{avgCalories}</h3>
+            <p>Avg Calories</p>
+          </div>
         </div>
 
         <div className="search-box">
@@ -188,7 +209,6 @@ function Home() {
                       style={{
                         color:
                           ratings[recipe._id] >= star ? "gold" : "#ccc",
-                        cursor: "pointer",
                       }}
                     >
                       ★
