@@ -6,6 +6,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const verifyToken = require("./middleware/authMiddleware");
 const recipeRoute = require("./routes/recipe");
+const helmet = require("helmet");
 
 // Initialize Express app
 const app = express();
@@ -16,6 +17,7 @@ const authRoute = require("./routes/auth");
 // Middlewares
 app.use(cors()); // Enable Cross-Origin Resource Sharing
 app.use(express.json()); // Parse JSON request bodies
+app.use(helmet());
 
 // Routes
 app.use("/api/auth", authRoute); // Authentication routes
