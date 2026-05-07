@@ -11,14 +11,20 @@ function Login() {
     e.preventDefault();
 
     try {
-      const res = await axios.post("http://localhost:5000/auth/login", {
-        email,
-        password,
-      });
+      const res = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        {
+          email,
+          password,
+        }
+      );
 
       localStorage.setItem("token", res.data.token);
+
+      alert("Login successful!");
       window.location.href = "/home";
     } catch (err) {
+      console.log(err);
       alert("Login failed");
     }
   };
@@ -27,7 +33,7 @@ function Login() {
     <div className="auth-container">
       {/* LEFT */}
       <div className="left-panel">
-        <h1 className="app-name"> MyRecipes</h1>
+        <h1 className="app-name">MyRecipes</h1>
 
         <h2>Welcome Back!</h2>
         <p>Login to continue exploring recipes</p>
@@ -47,6 +53,7 @@ function Login() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
           />
 
           <input
@@ -54,6 +61,7 @@ function Login() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
           />
 
           <button type="submit">Login</button>
