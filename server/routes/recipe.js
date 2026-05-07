@@ -113,6 +113,61 @@ router.put("/:id", verifyToken, async (req, res) => {
   }
 });
 
+// Get statistics for user's recipes
+router.get("/stats", verifyToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Total recipes
+    const totalRecipes = await Recipe.countDocuments({ user: userId });
+
+    // Average calories
+    const avgCaloriesResult = await Recipe.aggregate([
+      { $match: { user: req.user.id } },
+      {
+        $group: {
+          _id: null,
+          avgCalories: { $avg: "$calories" },
+        },
+      },
+    ]);
+
+    const avgCalories =
+      avgCaloriesResult.length > 0
+        ? avgCaloriesResult[0].avgCalories
+        : 0;
+
+    // Count by calorie levels
+    const low = await Recipe.countDocuments({
+      user: userId,
+      calories: { $lt: 300 },
+    });
+
+    const medium = await Recipe.countDocuments({
+      user: userId,
+      calories: { $gte: 300, $lte: 600 },
+    });
+
+    const high = await Recipe.countDocuments({
+      user: userId,
+      calories: { $gt: 600 },
+    });
+
+    res.status(200).json({
+      totalRecipes,
+      avgCalories,
+      lowCalories: low,
+      mediumCalories: medium,
+      highCalories: high,
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      message: "Error fetching stats",
+      error: err.message,
+    });
+  }
+});
 module.exports = router;
 // Rate a recipe
 router.post("/:id/rate", verifyToken, async (req, res) => {
