@@ -24,6 +24,19 @@ const recipeSchema = new mongoose.Schema(
       required: true,
     },
 
+    calories: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+
+    rating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5,
+    },
+
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User", // link recipe to user
