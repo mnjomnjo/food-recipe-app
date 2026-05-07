@@ -114,3 +114,40 @@ router.put("/:id", verifyToken, async (req, res) => {
 });
 
 module.exports = router;
+// Rate a recipe
+router.post("/:id/rate", verifyToken, async (req, res) => {
+  try {
+    const { rating } = req.body;
+
+    // Validate rating
+    if (rating < 1 || rating > 5) {
+      return res.status(400).json({
+        message: "Rating must be between 1 and 5",
+      });
+    }
+
+    const recipe = await Recipe.findById(req.params.id);
+
+    if (!recipe) {
+      return res.status(404).json({
+        message: "Recipe not found",
+      });
+    }
+
+    // Update rating
+    recipe.rating = rating;
+
+    await recipe.save();
+
+    res.status(200).json({
+      message: "Recipe rated successfully",
+      recipe,
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      message: "Error rating recipe",
+      error: err.message,
+    });
+  }
+});
