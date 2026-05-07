@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const mongoose = require("mongoose");
 const Recipe = require("../models/Recipe");
 const verifyToken = require("../middleware/authMiddleware");
 
@@ -16,6 +17,58 @@ router.post("/", verifyToken, async (req, res) => {
   } catch (err) {
     res.status(500).json({
       message: "Error creating recipe",
+      error: err.message,
+    });
+  }
+});
+
+// Get statistics for user's recipes
+router.get("/stats", verifyToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const totalRecipes = await Recipe.countDocuments({ user: userId });
+
+    const avgCaloriesResult = await Recipe.aggregate([
+      { $match: { user: new mongoose.Types.ObjectId(userId) } },
+      {
+        $group: {
+          _id: null,
+          avgCalories: { $avg: "$calories" },
+        },
+      },
+    ]);
+
+    const avgCalories =
+      avgCaloriesResult.length > 0
+        ? Math.round(avgCaloriesResult[0].avgCalories)
+        : 0;
+
+    const low = await Recipe.countDocuments({
+      user: userId,
+      calories: { $lt: 300 },
+    });
+
+    const medium = await Recipe.countDocuments({
+      user: userId,
+      calories: { $gte: 300, $lte: 600 },
+    });
+
+    const high = await Recipe.countDocuments({
+      user: userId,
+      calories: { $gt: 600 },
+    });
+
+    res.status(200).json({
+      totalRecipes,
+      avgCalories,
+      lowCalories: low,
+      mediumCalories: medium,
+      highCalories: high,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Error fetching stats",
       error: err.message,
     });
   }
@@ -52,6 +105,40 @@ router.get("/", verifyToken, async (req, res) => {
   } catch (err) {
     res.status(500).json({
       message: "Error fetching recipes",
+      error: err.message,
+    });
+  }
+});
+
+// Rate a recipe
+router.post("/:id/rate", verifyToken, async (req, res) => {
+  try {
+    const { rating } = req.body;
+
+    if (rating < 1 || rating > 5) {
+      return res.status(400).json({
+        message: "Rating must be between 1 and 5",
+      });
+    }
+
+    const recipe = await Recipe.findById(req.params.id);
+
+    if (!recipe) {
+      return res.status(404).json({
+        message: "Recipe not found",
+      });
+    }
+
+    recipe.rating = rating;
+    await recipe.save();
+
+    res.status(200).json({
+      message: "Recipe rated successfully",
+      recipe,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Error rating recipe",
       error: err.message,
     });
   }
@@ -113,96 +200,4 @@ router.put("/:id", verifyToken, async (req, res) => {
   }
 });
 
-// Get statistics for user's recipes
-router.get("/stats", verifyToken, async (req, res) => {
-  try {
-    const userId = req.user.id;
-
-    // Total recipes
-    const totalRecipes = await Recipe.countDocuments({ user: userId });
-
-    // Average calories
-    const avgCaloriesResult = await Recipe.aggregate([
-      { $match: { user: req.user.id } },
-      {
-        $group: {
-          _id: null,
-          avgCalories: { $avg: "$calories" },
-        },
-      },
-    ]);
-
-    const avgCalories =
-      avgCaloriesResult.length > 0
-        ? avgCaloriesResult[0].avgCalories
-        : 0;
-
-    // Count by calorie levels
-    const low = await Recipe.countDocuments({
-      user: userId,
-      calories: { $lt: 300 },
-    });
-
-    const medium = await Recipe.countDocuments({
-      user: userId,
-      calories: { $gte: 300, $lte: 600 },
-    });
-
-    const high = await Recipe.countDocuments({
-      user: userId,
-      calories: { $gt: 600 },
-    });
-
-    res.status(200).json({
-      totalRecipes,
-      avgCalories,
-      lowCalories: low,
-      mediumCalories: medium,
-      highCalories: high,
-    });
-
-  } catch (err) {
-    res.status(500).json({
-      message: "Error fetching stats",
-      error: err.message,
-    });
-  }
-});
 module.exports = router;
-// Rate a recipe
-router.post("/:id/rate", verifyToken, async (req, res) => {
-  try {
-    const { rating } = req.body;
-
-    // Validate rating
-    if (rating < 1 || rating > 5) {
-      return res.status(400).json({
-        message: "Rating must be between 1 and 5",
-      });
-    }
-
-    const recipe = await Recipe.findById(req.params.id);
-
-    if (!recipe) {
-      return res.status(404).json({
-        message: "Recipe not found",
-      });
-    }
-
-    // Update rating
-    recipe.rating = rating;
-
-    await recipe.save();
-
-    res.status(200).json({
-      message: "Recipe rated successfully",
-      recipe,
-    });
-
-  } catch (err) {
-    res.status(500).json({
-      message: "Error rating recipe",
-      error: err.message,
-    });
-  }
-});
