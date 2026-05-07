@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import toast from "react-hot-toast";
 import "./Home.css";
 
 function Home() {
@@ -12,7 +13,6 @@ function Home() {
   const [ratings, setRatings] = useState({});
   const [favorites, setFavorites] = useState([]);
 
-  // LOAD DATA
   useEffect(() => {
     const storedRecipes = JSON.parse(localStorage.getItem("recipes")) || [];
     const storedFav = JSON.parse(localStorage.getItem("favorites")) || [];
@@ -45,35 +45,28 @@ function Home() {
     setFavorites(storedFav);
   }, []);
 
-  //  RATING
   const handleRating = (id, rating) => {
     setRatings({ ...ratings, [id]: rating });
   };
 
-  //  FAVORITE
+  //  FAVORITE (Toast)
   const toggleFavorite = (id) => {
     let updated;
 
-    if (!favorites.includes(id)) {
-      const confirmAdd = window.confirm("Add this recipe to favorites?");
-      if (!confirmAdd) return;
-    }
-
     if (favorites.includes(id)) {
       updated = favorites.filter((fav) => fav !== id);
+      toast("Removed from favorites ❌");
     } else {
       updated = [...favorites, id];
+      toast.success("Added to favorites ❤️");
     }
 
     setFavorites(updated);
     localStorage.setItem("favorites", JSON.stringify(updated));
   };
 
-  //  DELETE
+  //  DELETE (Toast)
   const deleteRecipe = (id) => {
-    const confirmDelete = window.confirm("Delete this recipe?");
-    if (!confirmDelete) return;
-
     const updated = recipes.filter((r) => r._id !== id);
     setRecipes(updated);
 
@@ -81,9 +74,11 @@ function Home() {
     const filteredStored = stored.filter((r) => r._id !== id);
 
     localStorage.setItem("recipes", JSON.stringify(filteredStored));
+
+    toast.error("Recipe deleted 🗑️");
   };
 
-  //  STATISTICS
+  //  STATS
   const totalRecipes = recipes.length;
 
   const avgCalories =
@@ -103,13 +98,12 @@ function Home() {
           <p>Find your favorite meals easily</p>
         </div>
 
-        {/*  STATISTICS */}
+        {/* STATS */}
         <div className="stats">
           <div className="stat-box">
             <h3>{totalRecipes}</h3>
             <p>Total Recipes</p>
           </div>
-
           <div className="stat-box">
             <h3>{avgCalories}</h3>
             <p>Avg Calories</p>
@@ -126,42 +120,27 @@ function Home() {
         </div>
 
         <div className="filter-buttons">
-          <button
-            className={filter === "all" ? "active" : ""}
-            onClick={() => setFilter("all")}
-          >
-            All
-          </button>
-          <button
-            className={filter === "low" ? "active" : ""}
-            onClick={() => setFilter("low")}
-          >
-            Low
-          </button>
-          <button
-            className={filter === "medium" ? "active" : ""}
-            onClick={() => setFilter("medium")}
-          >
-            Medium
-          </button>
-          <button
-            className={filter === "high" ? "active" : ""}
-            onClick={() => setFilter("high")}
-          >
-            High
-          </button>
+          {["all", "low", "medium", "high"].map((type) => (
+            <button
+              key={type}
+              className={filter === type ? "active" : ""}
+              onClick={() => setFilter(type)}
+            >
+              {type}
+            </button>
+          ))}
         </div>
 
         <div className="recipes-grid">
           {recipes
-            .filter((recipe) =>
-              recipe.title.toLowerCase().includes(search.toLowerCase())
+            .filter((r) =>
+              r.title.toLowerCase().includes(search.toLowerCase())
             )
-            .filter((recipe) => {
-              if (filter === "low") return recipe.calories < 200;
+            .filter((r) => {
+              if (filter === "low") return r.calories < 200;
               if (filter === "medium")
-                return recipe.calories >= 200 && recipe.calories <= 400;
-              if (filter === "high") return recipe.calories > 400;
+                return r.calories >= 200 && r.calories <= 400;
+              if (filter === "high") return r.calories > 400;
               return true;
             })
             .map((recipe) => (
@@ -173,7 +152,7 @@ function Home() {
                 <img
                   src={
                     recipe.image ||
-                    "https://via.placeholder.com/300x200?text=No+Image"
+                    "https://via.placeholder.com/300x200"
                   }
                   alt={recipe.title}
                 />
@@ -181,7 +160,6 @@ function Home() {
                 <h3>{recipe.title}</h3>
                 <p>{recipe.calories} Calories</p>
 
-                {/* FAVORITE */}
                 <button
                   className="fav-btn"
                   onClick={(e) => {
@@ -197,7 +175,6 @@ function Home() {
                   ❤️
                 </button>
 
-                {/* RATING */}
                 <div className="rating">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <span
@@ -216,7 +193,6 @@ function Home() {
                   ))}
                 </div>
 
-                {/* DELETE */}
                 <button
                   className="delete-btn"
                   onClick={(e) => {

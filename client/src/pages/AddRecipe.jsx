@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import toast from "react-hot-toast";
 import "./AddRecipe.css";
 
 function AddRecipe() {
@@ -23,9 +24,8 @@ function AddRecipe() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    //  VALIDATION
     if (!formData.title || !formData.calories) {
-      alert("Please fill required fields");
+      toast.error("Please fill required fields ⚠️");
       return;
     }
 
@@ -45,6 +45,8 @@ function AddRecipe() {
       JSON.stringify([newRecipe, ...existing])
     );
 
+    toast.success("Recipe added successfully ");
+
     navigate("/home");
   };
 
@@ -62,7 +64,6 @@ function AddRecipe() {
             placeholder="Recipe Name"
             value={formData.title}
             onChange={handleChange}
-            required
           />
 
           <input
@@ -71,7 +72,6 @@ function AddRecipe() {
             placeholder="Calories"
             value={formData.calories}
             onChange={handleChange}
-            required
           />
 
           <input
