@@ -14,17 +14,46 @@ router.post("/", verifyToken, async (req, res) => {
     const savedRecipe = await newRecipe.save();
     res.status(201).json(savedRecipe);
   } catch (err) {
-    res.status(500).json({ message: "Error creating recipe", error: err.message });
+    res.status(500).json({
+      message: "Error creating recipe",
+      error: err.message,
+    });
   }
 });
 
-// Get all recipes for logged-in user
+// Get recipes for logged-in user with optional search and calorie filter
 router.get("/", verifyToken, async (req, res) => {
   try {
-    const recipes = await Recipe.find({ user: req.user.id });
+    const { search, calories } = req.query;
+
+    const query = {
+      user: req.user.id,
+    };
+
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+        { ingredients: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    if (calories === "low") {
+      query.calories = { $lt: 300 };
+    } else if (calories === "medium") {
+      query.calories = { $gte: 300, $lte: 600 };
+    } else if (calories === "high") {
+      query.calories = { $gt: 600 };
+    }
+
+    const recipes = await Recipe.find(query).sort({ createdAt: -1 });
+
     res.status(200).json(recipes);
   } catch (err) {
-    res.status(500).json({ message: "Error fetching recipes", error: err.message });
+    res.status(500).json({
+      message: "Error fetching recipes",
+      error: err.message,
+    });
   }
 });
 
@@ -37,14 +66,21 @@ router.delete("/:id", verifyToken, async (req, res) => {
     });
 
     if (!recipe) {
-      return res.status(404).json({ message: "Recipe not found or unauthorized" });
+      return res.status(404).json({
+        message: "Recipe not found or unauthorized",
+      });
     }
 
     await recipe.deleteOne();
-    res.status(200).json({ message: "Recipe deleted successfully" });
 
+    res.status(200).json({
+      message: "Recipe deleted successfully",
+    });
   } catch (err) {
-    res.status(500).json({ message: "Error deleting recipe", error: err.message });
+    res.status(500).json({
+      message: "Error deleting recipe",
+      error: err.message,
+    });
   }
 });
 
@@ -57,7 +93,9 @@ router.put("/:id", verifyToken, async (req, res) => {
     });
 
     if (!recipe) {
-      return res.status(404).json({ message: "Recipe not found or unauthorized" });
+      return res.status(404).json({
+        message: "Recipe not found or unauthorized",
+      });
     }
 
     const updatedRecipe = await Recipe.findByIdAndUpdate(
@@ -67,9 +105,11 @@ router.put("/:id", verifyToken, async (req, res) => {
     );
 
     res.status(200).json(updatedRecipe);
-
   } catch (err) {
-    res.status(500).json({ message: "Error updating recipe", error: err.message });
+    res.status(500).json({
+      message: "Error updating recipe",
+      error: err.message,
+    });
   }
 });
 
