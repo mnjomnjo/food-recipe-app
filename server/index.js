@@ -4,26 +4,66 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
-const verifyToken = require("./middleware/authMiddleware");
-const recipeRoute = require("./routes/recipe");
+
+// Security packages
 const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+
+// Middleware
+const verifyToken = require("./middleware/authMiddleware");
+
+// Routes
+const authRoute = require("./routes/auth");
+const recipeRoute = require("./routes/recipe");
 
 // Initialize Express app
 const app = express();
 
-// Import routes
-const authRoute = require("./routes/auth");
 
-// Middlewares
-app.use(cors()); // Enable Cross-Origin Resource Sharing
-app.use(express.json()); // Parse JSON request bodies
+// =========================
+// Security Middlewares
+// =========================
+
+// Enable secure HTTP headers
 app.use(helmet());
 
-// Routes
-app.use("/api/auth", authRoute); // Authentication routes
+// Prevent too many requests from the same IP
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests
+  message: "Too many requests, please try again later.",
+});
+
+app.use(limiter);
+
+
+// =========================
+// General Middlewares
+// =========================
+
+// Enable Cross-Origin Resource Sharing
+app.use(cors());
+
+// Parse JSON request bodies
+app.use(express.json());
+
+
+// =========================
+// API Routes
+// =========================
+
+// Authentication routes
+app.use("/api/auth", authRoute);
+
+// Recipe routes
 app.use("/api/recipes", recipeRoute);
 
-// Protected route (only logged-in users can access)
+
+// =========================
+// Protected Route Example
+// =========================
+
+// Only authenticated users can access this route
 app.get("/api/protected", verifyToken, (req, res) => {
   res.json({
     message: "You are authorized",
@@ -31,15 +71,29 @@ app.get("/api/protected", verifyToken, (req, res) => {
   });
 });
 
+
+// =========================
+// Database Connection
+// =========================
+
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected ✅"))
-  .catch(err => console.log(err));
+  .catch((err) => console.log(err));
 
-// Test route
+
+// =========================
+// Test Route
+// =========================
+
 app.get("/", (req, res) => {
   res.send("API is running...");
 });
+
+
+// =========================
+// Start Server
+// =========================
 
 // Define server port
 const PORT = process.env.PORT || 5000;
