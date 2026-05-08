@@ -1,37 +1,107 @@
+/* NAVBAR  */
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
 
-  padding: 15px 40px;
+  padding: 16px 40px;
   background: white;
 
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
+/*  LOGO */
 .logo {
   font-family: 'Montserrat', sans-serif;
-  font-size: 22px;
+  font-size: 28px;
   font-weight: 700;
+  color: #ff5e62;
 }
 
+/* LINKS */
 .nav-links {
   display: flex;
-  gap: 20px;
+  gap: 22px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .nav-links a {
   text-decoration: none;
   color: #333;
-  font-weight: 500;
+  font-weight: 600;
+  transition: 0.3s;
+  position: relative;
 }
 
+/* HOVER EFFECT */
+.nav-links a:hover {
+  color: #ff5e62;
+}
+
+/* UNDERLINE EFFECT */
+.nav-links a::after {
+  content: "";
+  position: absolute;
+
+  width: 0%;
+  height: 2px;
+
+  left: 0;
+  bottom: -4px;
+
+  background: #ff5e62;
+
+  transition: 0.3s;
+}
+
+.nav-links a:hover::after {
+  width: 100%;
+}
+
+/* LOGOUT BUTTON */
 .logout-btn {
   background: #ff5e62;
   color: white;
   border: none;
-  padding: 8px 15px;
-  border-radius: 8px;
+
+  padding: 10px 18px;
+  border-radius: 10px;
+
   cursor: pointer;
+
+  font-weight: 600;
+
+  transition: 0.3s;
+}
+
+.logout-btn:hover {
+  background: #ff3b40;
+  transform: translateY(-2px);
+}
+
+/*  RESPONSIVE  */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+  }
+
+  .logo {
+    font-size: 24px;
+  }
+
+  .nav-links {
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .logout-btn {
+    width: 100%;
+  }
 }

@@ -9,7 +9,7 @@ function Navbar() {
   const handleLogout = () => {
     localStorage.removeItem("token");
 
-    toast.success("Logged out successfully ");
+    toast.success("Logged out successfully ✅");
 
     navigate("/");
   };
@@ -27,6 +27,10 @@ function Navbar() {
 
         <Link to="/add">
           Add Recipe
+        </Link>
+
+        <Link to="/about">
+          About
         </Link>
 
         <button

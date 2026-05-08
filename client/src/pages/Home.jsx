@@ -13,14 +13,22 @@ function Home() {
   const [filter, setFilter] = useState("all");
   const [ratings, setRatings] = useState({});
   const [favorites, setFavorites] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // LOAD RECIPES FROM BACKEND
   useEffect(() => {
     fetchRecipes();
+
+    const storedFav =
+      JSON.parse(localStorage.getItem("favorites")) || [];
+
+    setFavorites(storedFav);
   }, []);
 
   const fetchRecipes = async () => {
     try {
+      setLoading(true);
+
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
@@ -36,6 +44,8 @@ function Home() {
     } catch (err) {
       console.log(err);
       toast.error("Failed to load recipes");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -54,7 +64,20 @@ function Home() {
         }
       );
 
-      setRatings({ ...ratings, [id]: rating });
+      // UPDATE LOCAL STATE
+      setRatings({
+        ...ratings,
+        [id]: rating,
+      });
+
+      // UPDATE RECIPES STATE
+      const updatedRecipes = recipes.map((recipe) =>
+        recipe._id === id
+          ? { ...recipe, rating }
+          : recipe
+      );
+
+      setRecipes(updatedRecipes);
 
       toast.success("Recipe rated ⭐");
     } catch (err) {
@@ -68,14 +91,20 @@ function Home() {
 
     if (favorites.includes(id)) {
       updated = favorites.filter((fav) => fav !== id);
+
       toast("Removed from favorites ❌");
     } else {
       updated = [...favorites, id];
+
       toast.success("Added to favorites ❤️");
     }
 
     setFavorites(updated);
-    localStorage.setItem("favorites", JSON.stringify(updated));
+
+    localStorage.setItem(
+      "favorites",
+      JSON.stringify(updated)
+    );
   };
 
   // DELETE RECIPE
@@ -92,7 +121,10 @@ function Home() {
         }
       );
 
-      const updated = recipes.filter((r) => r._id !== id);
+      const updated = recipes.filter(
+        (r) => r._id !== id
+      );
+
       setRecipes(updated);
 
       toast.error("Recipe deleted 🗑️");
@@ -101,14 +133,38 @@ function Home() {
     }
   };
 
+  // FILTERED RECIPES
+  const filteredRecipes = recipes
+    .filter((r) =>
+      r.title
+        .toLowerCase()
+        .includes(search.toLowerCase())
+    )
+    .filter((r) => {
+      if (filter === "low") return r.calories < 200;
+
+      if (filter === "medium") {
+        return (
+          r.calories >= 200 &&
+          r.calories <= 400
+        );
+      }
+
+      if (filter === "high") return r.calories > 400;
+
+      return true;
+    });
+
   // STATS
   const totalRecipes = recipes.length;
 
   const avgCalories =
     recipes.length > 0
       ? Math.round(
-          recipes.reduce((sum, r) => sum + r.calories, 0) /
-            recipes.length
+          recipes.reduce(
+            (sum, r) => sum + r.calories,
+            0
+          ) / recipes.length
         )
       : 0;
 
@@ -119,18 +175,23 @@ function Home() {
       <div className="home-container">
         <div className="hero">
           <h1>Discover Recipes</h1>
-          <p>Find your favorite meals easily</p>
+
+          <p>
+            Find your favorite meals easily
+          </p>
         </div>
 
         {/* STATS */}
         <div className="stats">
           <div className="stat-box">
             <h3>{totalRecipes}</h3>
+
             <p>Total Recipes</p>
           </div>
 
           <div className="stat-box">
             <h3>{avgCalories}</h3>
+
             <p>Avg Calories</p>
           </div>
         </div>
@@ -141,43 +202,41 @@ function Home() {
             type="text"
             placeholder="Search recipes..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) =>
+              setSearch(e.target.value)
+            }
           />
         </div>
 
         {/* FILTER */}
         <div className="filter-buttons">
-          {["all", "low", "medium", "high"].map((type) => (
-            <button
-              key={type}
-              className={filter === type ? "active" : ""}
-              onClick={() => setFilter(type)}
-            >
-              {type}
-            </button>
-          ))}
+          {["all", "low", "medium", "high"].map(
+            (type) => (
+              <button
+                key={type}
+                className={
+                  filter === type ? "active" : ""
+                }
+                onClick={() => setFilter(type)}
+              >
+                {type}
+              </button>
+            )
+          )}
         </div>
 
-        {/* RECIPES */}
-        <div className="recipes-grid">
-          {recipes
-            .filter((r) =>
-              r.title.toLowerCase().includes(search.toLowerCase())
-            )
-            .filter((r) => {
-              if (filter === "low") return r.calories < 200;
-
-              if (filter === "medium")
-                return (
-                  r.calories >= 200 &&
-                  r.calories <= 400
-                );
-
-              if (filter === "high") return r.calories > 400;
-
-              return true;
-            })
-            .map((recipe) => (
+        {/* LOADING */}
+        {loading ? (
+          <h2 className="loading-text">
+            Loading recipes...
+          </h2>
+        ) : filteredRecipes.length === 0 ? (
+          <h2 className="empty-text">
+            No recipes found 
+          </h2>
+        ) : (
+          <div className="recipes-grid">
+            {filteredRecipes.map((recipe) => (
               <div
                 key={recipe._id}
                 className="card"
@@ -195,17 +254,22 @@ function Home() {
 
                 <h3>{recipe.title}</h3>
 
-                <p>{recipe.calories} Calories</p>
+                <p>
+                  {recipe.calories} Calories
+                </p>
 
                 {/* FAVORITES */}
                 <button
                   className="fav-btn"
                   onClick={(e) => {
                     e.stopPropagation();
+
                     toggleFavorite(recipe._id);
                   }}
                   style={{
-                    color: favorites.includes(recipe._id)
+                    color: favorites.includes(
+                      recipe._id
+                    )
                       ? "red"
                       : "#999",
                   }}
@@ -220,11 +284,19 @@ function Home() {
                       key={star}
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleRating(recipe._id, star);
+
+                        handleRating(
+                          recipe._id,
+                          star
+                        );
                       }}
                       style={{
                         color:
-                          ratings[recipe._id] >= star
+                          (
+                            ratings[
+                              recipe._id
+                            ] || recipe.rating
+                          ) >= star
                             ? "gold"
                             : "#ccc",
                       }}
@@ -239,6 +311,7 @@ function Home() {
                   className="delete-btn"
                   onClick={(e) => {
                     e.stopPropagation();
+
                     deleteRecipe(recipe._id);
                   }}
                 >
@@ -246,7 +319,8 @@ function Home() {
                 </button>
               </div>
             ))}
-        </div>
+          </div>
+        )}
       </div>
     </>
   );

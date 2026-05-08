@@ -7,20 +7,37 @@ import Home from "./pages/Home";
 import RecipeDetails from "./pages/RecipeDetails";
 import AddRecipe from "./pages/AddRecipe";
 import Favorites from "./pages/Favorites";
+import About from "./pages/About";
 
 function App() {
   return (
     <Router>
-      {/*  Toast Container */}
+      {/* Toast Container */}
       <Toaster position="top-right" />
 
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+
+        <Route
+          path="/register"
+          element={<Register />}
+        />
+
         <Route path="/home" element={<Home />} />
-        <Route path="/recipe/:id" element={<RecipeDetails />} />
+
+        <Route
+          path="/recipe/:id"
+          element={<RecipeDetails />}
+        />
+
         <Route path="/add" element={<AddRecipe />} />
-        <Route path="/favorites" element={<Favorites />} />
+
+        <Route
+          path="/favorites"
+          element={<Favorites />}
+        />
+
+        <Route path="/about" element={<About />} />
       </Routes>
     </Router>
   );

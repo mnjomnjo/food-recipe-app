@@ -1,4 +1,4 @@
-/* ===== PAGE ===== */
+/*  PAGE  */
 .home-container {
   padding: 40px 20px;
   text-align: center;
@@ -7,67 +7,86 @@
   font-family: "Poppins", sans-serif;
 }
 
-/* ===== HERO ===== */
+/* HERO  */
 .hero h1 {
-  font-size: 32px;
+  font-size: 42px;
   margin-bottom: 10px;
+  color: #222;
 }
 
 .hero p {
   color: #721212;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+  font-size: 18px;
 }
 
-/* ===== STATS ===== */
+/*  STATS */
 .stats {
   display: flex;
   justify-content: center;
   gap: 30px;
-  margin: 20px 0;
+  margin: 30px 0;
+  flex-wrap: wrap;
 }
 
 .stat-box {
   background: white;
-  padding: 20px 30px;
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  padding: 22px 35px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  transition: 0.3s ease;
+}
+
+.stat-box:hover {
+  transform: translateY(-5px);
 }
 
 .stat-box h3 {
   margin: 0;
   color: #ff5e62;
+  font-size: 28px;
 }
 
 .stat-box p {
-  margin: 5px 0 0;
-  font-size: 14px;
+  margin-top: 8px;
+  font-size: 15px;
+  color: #555;
 }
 
-/* ===== SEARCH ===== */
+/*  SEARCH  */
 .search-box input {
-  padding: 12px;
-  width: 260px;
-  border-radius: 10px;
+  padding: 14px;
+  width: 280px;
+  border-radius: 12px;
   border: 1px solid #ddd;
+  outline: none;
+  transition: 0.3s;
+  font-size: 15px;
 }
 
 .search-box input:focus {
   border-color: #ff5e62;
-  box-shadow: 0 0 5px rgba(255, 94, 98, 0.3);
+  box-shadow: 0 0 10px rgba(255, 94, 98, 0.3);
 }
 
-/* ===== FILTER ===== */
+/* FILTER  */
 .filter-buttons {
-  margin: 20px 0;
+  margin: 25px 0;
 }
 
 .filter-buttons button {
   margin: 5px;
-  padding: 8px 16px;
-  border-radius: 20px;
+  padding: 10px 18px;
+  border-radius: 25px;
   border: none;
   background: #eee;
   cursor: pointer;
+  transition: 0.3s;
+  font-weight: 500;
+}
+
+.filter-buttons button:hover {
+  background: #ffb3b5;
 }
 
 .filter-buttons .active {
@@ -75,64 +94,131 @@
   color: white;
 }
 
-/* ===== GRID ===== */
+/*  GRID */
 .recipes-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 300px));
-  gap: 25px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 320px));
+  gap: 30px;
   justify-content: center;
-  margin-top: 20px;
+  margin-top: 30px;
 }
 
-/* ===== CARD ===== */
+/*  CARD */
 .card {
   background: white;
-  padding: 20px;
-  border-radius: 15px;
+  padding: 18px;
+  border-radius: 18px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-  transition: 0.3s;
+  transition: 0.35s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
 }
 
 .card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.15);
 }
 
-/* ===== IMAGE ===== */
+/*  IMAGE  */
 .card img {
   width: 100%;
-  height: 180px;
+  height: 220px;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: 14px;
+  transition: 0.3s;
 }
 
-/* ===== TEXT ===== */
+.card:hover img {
+  transform: scale(1.03);
+}
+
+/*  TEXT  */
 .card h3 {
-  margin: 10px 0 5px;
+  margin: 15px 0 8px;
+  color: #222;
+  font-size: 24px;
 }
 
 .card p {
   color: #777;
+  margin-bottom: 12px;
 }
 
-/* ===== FAVORITE ===== */
+/*  FAVORITE  */
 .fav-btn {
-  background: none;
+  background: #fff0f0;
   border: none;
-  font-size: 20px;
+  font-size: 22px;
   cursor: pointer;
+  border-radius: 12px;
+  padding: 10px 14px;
+  transition: 0.3s;
 }
 
-/* ===== RATING ===== */
-.rating span {
-  font-size: 20px;
-  margin: 2px;
-  cursor: pointer;
+.fav-btn:hover {
+  transform: scale(1.1);
 }
 
-/* ===== DELETE ===== */
-.delete-btn {
+/* RATING  */
+.rating {
   margin-top: 10px;
+}
+
+.rating span {
+  font-size: 22px;
+  margin: 3px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.rating span:hover {
+  transform: scale(1.2);
+}
+
+/*  DELETE  */
+.delete-btn {
+  margin-top: 12px;
   background: none;
   border: none;
   cursor: pointer;
+  font-size: 18px;
+  transition: 0.2s;
+}
+
+.delete-btn:hover {
+  transform: scale(1.2);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 30px;
+  }
+
+  .search-box input {
+    width: 90%;
+  }
+
+  .recipes-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    max-width: 95%;
+    margin: auto;
+  }
+}
+/*  LOADING  */
+.loading-text {
+  margin-top: 40px;
+  color: #333;
+  font-size: 28px;
+}
+
+/* EMPTY  */
+.empty-text {
+  margin-top: 40px;
+  color: #721212;
+  font-size: 28px;
 }

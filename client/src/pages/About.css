@@ -1,0 +1,55 @@
+.about-container {
+  min-height: 100vh;
+  background: #c8ae89;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 40px 20px;
+}
+
+.about-card {
+  background: white;
+
+  max-width: 800px;
+  width: 100%;
+
+  padding: 40px;
+
+  border-radius: 25px;
+
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+
+  text-align: center;
+}
+
+.about-card h1 {
+  margin-bottom: 20px;
+  font-size: 42px;
+}
+
+.about-card p {
+  color: #555;
+  line-height: 1.8;
+  font-size: 18px;
+}
+
+.about-section {
+  margin-top: 35px;
+}
+
+.about-section h2 {
+  margin-bottom: 15px;
+  color: #ff5e62;
+}
+
+.about-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.about-section li {
+  margin: 10px 0;
+  font-size: 17px;
+}
