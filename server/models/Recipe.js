@@ -14,8 +14,13 @@ const recipeSchema = new mongoose.Schema(
       required: true,
     },
 
+    // ADD IMAGE FIELD
+    image: {
+      type: String,
+    },
+
     ingredients: {
-      type: [String], // array of strings
+      type: [String],
       required: true,
     },
 
@@ -39,7 +44,7 @@ const recipeSchema = new mongoose.Schema(
 
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // link recipe to user
+      ref: "User",
       required: true,
     },
   },
