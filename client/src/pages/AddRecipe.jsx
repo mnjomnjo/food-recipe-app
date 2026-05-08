@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import Navbar from "../components/Navbar";
 import toast from "react-hot-toast";
 import "./AddRecipe.css";
@@ -12,6 +13,8 @@ function AddRecipe() {
     calories: "",
     image: "",
     description: "",
+    ingredients: "",
+    instructions: "",
   });
 
   const handleChange = (e) => {
@@ -21,7 +24,8 @@ function AddRecipe() {
     });
   };
 
-  const handleSubmit = (e) => {
+  // ADD RECIPE TO BACKEND
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!formData.title || !formData.calories) {
@@ -29,25 +33,41 @@ function AddRecipe() {
       return;
     }
 
-    const newRecipe = {
-      ...formData,
-      calories: Number(formData.calories),
-      image:
-        formData.image ||
-        "https://via.placeholder.com/300x200?text=No+Image",
-      _id: Date.now(),
-    };
+    try {
+      const token = localStorage.getItem("token");
 
-    const existing = JSON.parse(localStorage.getItem("recipes")) || [];
+      const recipeData = {
+        title: formData.title,
+        description: formData.description,
+        calories: Number(formData.calories),
+        image:
+          formData.image ||
+          "https://via.placeholder.com/300x200?text=No+Image",
 
-    localStorage.setItem(
-      "recipes",
-      JSON.stringify([newRecipe, ...existing])
-    );
+        ingredients: formData.ingredients
+          ? formData.ingredients.split(",")
+          : [],
 
-    toast.success("Recipe added successfully ");
+        instructions: formData.instructions,
+      };
 
-    navigate("/home");
+      await axios.post(
+        "http://localhost:5000/api/recipes",
+        recipeData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      toast.success("Recipe added successfully ✅");
+
+      navigate("/home");
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to add recipe ❌");
+    }
   };
 
   return (
@@ -89,7 +109,23 @@ function AddRecipe() {
             onChange={handleChange}
           />
 
-          <button type="submit">Add Recipe</button>
+          <textarea
+            name="ingredients"
+            placeholder="Ingredients separated by commas"
+            value={formData.ingredients}
+            onChange={handleChange}
+          />
+
+          <textarea
+            name="instructions"
+            placeholder="Cooking Instructions"
+            value={formData.instructions}
+            onChange={handleChange}
+          />
+
+          <button type="submit">
+            Add Recipe
+          </button>
         </form>
       </div>
     </>

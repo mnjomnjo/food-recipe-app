@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import Navbar from "../components/Navbar";
 import toast from "react-hot-toast";
 import "./Home.css";
@@ -13,43 +14,55 @@ function Home() {
   const [ratings, setRatings] = useState({});
   const [favorites, setFavorites] = useState([]);
 
+  // LOAD RECIPES FROM BACKEND
   useEffect(() => {
-    const storedRecipes = JSON.parse(localStorage.getItem("recipes")) || [];
-    const storedFav = JSON.parse(localStorage.getItem("favorites")) || [];
-
-    const defaultRecipes = [
-      {
-        _id: 1,
-        title: "Chicken",
-        calories: 300,
-        image:
-          "https://i0.wp.com/magic-stores.com/wp-content/uploads/2021/05/%D9%81%D8%B1%D9%88%D8%AC-%D9%85%D8%B4%D9%88%D9%8A.png?resize=600%2C400&ssl=1",
-      },
-      {
-        _id: 2,
-        title: "Salad",
-        calories: 150,
-        image:
-          "https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=800&q=80",
-      },
-      {
-        _id: 3,
-        title: "Pasta",
-        calories: 500,
-        image:
-          "https://images.unsplash.com/photo-1525755662778-989d0524087e?auto=format&fit=crop&w=800&q=80",
-      },
-    ];
-
-    setRecipes([...storedRecipes, ...defaultRecipes]);
-    setFavorites(storedFav);
+    fetchRecipes();
   }, []);
 
-  const handleRating = (id, rating) => {
-    setRatings({ ...ratings, [id]: rating });
+  const fetchRecipes = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await axios.get(
+        "http://localhost:5000/api/recipes",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setRecipes(res.data);
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to load recipes");
+    }
   };
 
-  //  FAVORITE (Toast)
+  // RATING
+  const handleRating = async (id, rating) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await axios.post(
+        `http://localhost:5000/api/recipes/${id}/rate`,
+        { rating },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setRatings({ ...ratings, [id]: rating });
+
+      toast.success("Recipe rated ⭐");
+    } catch (err) {
+      toast.error("Rating failed");
+    }
+  };
+
+  // FAVORITES
   const toggleFavorite = (id) => {
     let updated;
 
@@ -65,26 +78,37 @@ function Home() {
     localStorage.setItem("favorites", JSON.stringify(updated));
   };
 
-  //  DELETE (Toast)
-  const deleteRecipe = (id) => {
-    const updated = recipes.filter((r) => r._id !== id);
-    setRecipes(updated);
+  // DELETE RECIPE
+  const deleteRecipe = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
 
-    const stored = JSON.parse(localStorage.getItem("recipes")) || [];
-    const filteredStored = stored.filter((r) => r._id !== id);
+      await axios.delete(
+        `http://localhost:5000/api/recipes/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    localStorage.setItem("recipes", JSON.stringify(filteredStored));
+      const updated = recipes.filter((r) => r._id !== id);
+      setRecipes(updated);
 
-    toast.error("Recipe deleted 🗑️");
+      toast.error("Recipe deleted 🗑️");
+    } catch (err) {
+      toast.error("Delete failed");
+    }
   };
 
-  //  STATS
+  // STATS
   const totalRecipes = recipes.length;
 
   const avgCalories =
     recipes.length > 0
       ? Math.round(
-          recipes.reduce((sum, r) => sum + r.calories, 0) / recipes.length
+          recipes.reduce((sum, r) => sum + r.calories, 0) /
+            recipes.length
         )
       : 0;
 
@@ -94,7 +118,7 @@ function Home() {
 
       <div className="home-container">
         <div className="hero">
-          <h1>Discover Recipes </h1>
+          <h1>Discover Recipes</h1>
           <p>Find your favorite meals easily</p>
         </div>
 
@@ -104,12 +128,14 @@ function Home() {
             <h3>{totalRecipes}</h3>
             <p>Total Recipes</p>
           </div>
+
           <div className="stat-box">
             <h3>{avgCalories}</h3>
             <p>Avg Calories</p>
           </div>
         </div>
 
+        {/* SEARCH */}
         <div className="search-box">
           <input
             type="text"
@@ -119,6 +145,7 @@ function Home() {
           />
         </div>
 
+        {/* FILTER */}
         <div className="filter-buttons">
           {["all", "low", "medium", "high"].map((type) => (
             <button
@@ -131,6 +158,7 @@ function Home() {
           ))}
         </div>
 
+        {/* RECIPES */}
         <div className="recipes-grid">
           {recipes
             .filter((r) =>
@@ -138,16 +166,24 @@ function Home() {
             )
             .filter((r) => {
               if (filter === "low") return r.calories < 200;
+
               if (filter === "medium")
-                return r.calories >= 200 && r.calories <= 400;
+                return (
+                  r.calories >= 200 &&
+                  r.calories <= 400
+                );
+
               if (filter === "high") return r.calories > 400;
+
               return true;
             })
             .map((recipe) => (
               <div
                 key={recipe._id}
                 className="card"
-                onClick={() => navigate(`/recipe/${recipe._id}`)}
+                onClick={() =>
+                  navigate(`/recipe/${recipe._id}`)
+                }
               >
                 <img
                   src={
@@ -158,8 +194,10 @@ function Home() {
                 />
 
                 <h3>{recipe.title}</h3>
+
                 <p>{recipe.calories} Calories</p>
 
+                {/* FAVORITES */}
                 <button
                   className="fav-btn"
                   onClick={(e) => {
@@ -175,6 +213,7 @@ function Home() {
                   ❤️
                 </button>
 
+                {/* RATING */}
                 <div className="rating">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <span
@@ -185,7 +224,9 @@ function Home() {
                       }}
                       style={{
                         color:
-                          ratings[recipe._id] >= star ? "gold" : "#ccc",
+                          ratings[recipe._id] >= star
+                            ? "gold"
+                            : "#ccc",
                       }}
                     >
                       ★
@@ -193,6 +234,7 @@ function Home() {
                   ))}
                 </div>
 
+                {/* DELETE */}
                 <button
                   className="delete-btn"
                   onClick={(e) => {
