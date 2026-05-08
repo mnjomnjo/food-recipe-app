@@ -10,7 +10,7 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 
 // Middleware
-const verifyToken = require("./middleware/authMiddleware");
+const { verifyToken, verifyAdmin } = require("./middleware/authMiddleware");
 
 // Routes
 const authRoute = require("./routes/auth");
@@ -71,6 +71,12 @@ app.get("/api/protected", verifyToken, (req, res) => {
   });
 });
 
+// Admin-only route
+app.get("/api/admin", verifyToken, verifyAdmin, (req, res) => {
+  res.json({
+    message: "Welcome Admin 🔥",
+  });
+});
 
 // =========================
 // Database Connection

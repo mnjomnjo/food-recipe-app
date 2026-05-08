@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Recipe = require("../models/Recipe");
-const verifyToken = require("../middleware/authMiddleware");
+const { verifyToken } = require("../middleware/authMiddleware");
 
 // Create recipe
 router.post("/", verifyToken, async (req, res) => {
