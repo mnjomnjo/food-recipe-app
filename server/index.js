@@ -12,6 +12,10 @@ const rateLimit = require("express-rate-limit");
 // Middleware
 const { verifyToken, verifyAdmin } = require("./middleware/authMiddleware");
 
+// Models
+const User = require("./models/User");
+const Recipe = require("./models/Recipe");
+
 // Routes
 const authRoute = require("./routes/auth");
 const recipeRoute = require("./routes/recipe");
@@ -60,7 +64,7 @@ app.use("/api/recipes", recipeRoute);
 
 
 // =========================
-// Protected Route Example
+// Protected Routes
 // =========================
 
 // Only authenticated users can access this route
@@ -78,6 +82,32 @@ app.get("/api/admin", verifyToken, verifyAdmin, (req, res) => {
   });
 });
 
+// Admin statistics route
+app.get("/api/stats", verifyToken, verifyAdmin, async (req, res) => {
+  try {
+
+    // Count total users
+    const totalUsers = await User.countDocuments();
+
+    // Count total recipes
+    const totalRecipes = await Recipe.countDocuments();
+
+    // Send statistics response
+    res.status(200).json({
+      totalUsers,
+      totalRecipes,
+    });
+
+  } catch (err) {
+
+    res.status(500).json({
+      message: "Error fetching statistics",
+      error: err.message,
+    });
+  }
+});
+
+
 // =========================
 // Database Connection
 // =========================
@@ -92,6 +122,7 @@ mongoose.connect(process.env.MONGO_URI)
 // Test Route
 // =========================
 
+// Simple test route
 app.get("/", (req, res) => {
   res.send("API is running...");
 });

@@ -18,16 +18,20 @@ router.post("/", verifyToken, async (req, res) => {
   }
 });
 
-// Get all recipes for logged-in user
+// Get all recipes
 router.get("/", verifyToken, async (req, res) => {
   try {
-    const recipes = await Recipe.find({ user: req.user.id });
+    const recipes = await Recipe.find();
+
     res.status(200).json(recipes);
+
   } catch (err) {
-    res.status(500).json({ message: "Error fetching recipes", error: err.message });
+    res.status(500).json({
+      message: "Error fetching recipes",
+      error: err.message,
+    });
   }
 });
-
 // Delete recipe
 router.delete("/:id", verifyToken, async (req, res) => {
   try {
