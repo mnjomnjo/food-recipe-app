@@ -5,6 +5,7 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
+const nodemailer = require("nodemailer");
 
 
 // ================= REGISTER =================
@@ -188,10 +189,32 @@ router.post("/forgot-password", async (req, res) => {
     // Save updated user
     await user.save();
 
-    // Send response
+    // Create email transporter
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    // Create reset URL
+    const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
+
+    // Email message
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: user.email,
+      subject: "Password Reset",
+      text: `Reset your password using this link: ${resetUrl}`,
+    };
+
+    // Send email
+    await transporter.sendMail(mailOptions);
+
+    // Send success response
     res.status(200).json({
-      message: "Password reset token generated",
-      resetToken,
+      message: "Password reset email sent",
     });
 
   } catch (err) {
