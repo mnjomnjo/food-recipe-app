@@ -141,4 +141,22 @@ router.post("/refresh", (req, res) => {
 });
 
 
+// ================= LOGOUT =================
+router.post("/logout", (req, res) => {
+
+  // Clear refresh token cookie
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    sameSite: "strict",
+    secure: false, // Change to true in production
+  });
+
+  // Send logout response
+  res.status(200).json({
+    message: "Logged out successfully",
+  });
+
+});
+
+
 module.exports = router;
