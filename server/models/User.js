@@ -28,6 +28,16 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"], // allowed values
       default: "user", // default role
     },
+
+    // Password reset token
+    resetPasswordToken: {
+      type: String,
+    },
+
+    // Password reset token expiration
+    resetPasswordExpire: {
+      type: Date,
+    },
   },
 
   // Automatically add createdAt and updatedAt

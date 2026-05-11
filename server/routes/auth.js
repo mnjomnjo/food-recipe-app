@@ -4,6 +4,7 @@ const router = express.Router();
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 
 // ================= REGISTER =================
@@ -159,4 +160,100 @@ router.post("/logout", (req, res) => {
 });
 
 
+// ================= FORGOT PASSWORD =================
+router.post("/forgot-password", async (req, res) => {
+
+  try {
+
+    // Get email from request body
+    const { email } = req.body;
+
+    // Find user by email
+    const user = await User.findOne({ email });
+
+    // Check if user exists
+    if (!user) {
+      return res.status(404).json("User not found");
+    }
+
+    // Generate random reset token
+    const resetToken = crypto.randomBytes(32).toString("hex");
+
+    // Save token to database
+    user.resetPasswordToken = resetToken;
+
+    // Set token expiration time (15 minutes)
+    user.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
+
+    // Save updated user
+    await user.save();
+
+    // Send response
+    res.status(200).json({
+      message: "Password reset token generated",
+      resetToken,
+    });
+
+  } catch (err) {
+
+    // Handle server errors
+    res.status(500).json(err);
+  }
+
+});
+
+
+// ================= RESET PASSWORD =================
+router.post("/reset-password/:token", async (req, res) => {
+
+  try {
+
+    // Get token from URL params
+    const resetToken = req.params.token;
+
+    // Get new password from request body
+    const { password } = req.body;
+
+    // Find user with matching token
+    const user = await User.findOne({
+      resetPasswordToken: resetToken,
+      resetPasswordExpire: { $gt: Date.now() },
+    });
+
+    // Check if token is valid
+    if (!user) {
+      return res.status(400).json("Invalid or expired token");
+    }
+
+    // Generate salt
+    const salt = await bcrypt.genSalt(10);
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Update password
+    user.password = hashedPassword;
+
+    // Remove reset token fields
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    // Save updated user
+    await user.save();
+
+    // Send success response
+    res.status(200).json({
+      message: "Password reset successful",
+    });
+
+  } catch (err) {
+
+    // Handle server errors
+    res.status(500).json(err);
+  }
+
+});
+
+
+// Export router
 module.exports = router;
