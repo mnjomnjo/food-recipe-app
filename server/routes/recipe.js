@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const Recipe = require("../models/Recipe");
+const User = require("../models/User");
 const verifyToken = require("../middleware/authMiddleware");
 
 // Create recipe
@@ -74,6 +75,20 @@ router.get("/stats", verifyToken, async (req, res) => {
   }
 });
 
+// Get my favorite recipes
+router.get("/favorites/my", verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).populate("favorites");
+
+    res.status(200).json(user.favorites);
+  } catch (err) {
+    res.status(500).json({
+      message: "Error fetching favorites",
+      error: err.message,
+    });
+  }
+});
+
 // Get recipes for logged-in user with optional search and calorie filter
 router.get("/", verifyToken, async (req, res) => {
   try {
@@ -139,6 +154,55 @@ router.post("/:id/rate", verifyToken, async (req, res) => {
   } catch (err) {
     res.status(500).json({
       message: "Error rating recipe",
+      error: err.message,
+    });
+  }
+});
+
+// Add recipe to favorites
+router.post("/:id/favorite", verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (user.favorites.includes(req.params.id)) {
+      return res.status(400).json({
+        message: "Recipe already in favorites",
+      });
+    }
+
+    user.favorites.push(req.params.id);
+    await user.save();
+
+    res.status(200).json({
+      message: "Recipe added to favorites",
+      favorites: user.favorites,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Error adding favorite",
+      error: err.message,
+    });
+  }
+});
+
+// Remove recipe from favorites
+router.delete("/:id/favorite", verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    user.favorites = user.favorites.filter(
+      (fav) => fav.toString() !== req.params.id
+    );
+
+    await user.save();
+
+    res.status(200).json({
+      message: "Recipe removed from favorites",
+      favorites: user.favorites,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Error removing favorite",
       error: err.message,
     });
   }
