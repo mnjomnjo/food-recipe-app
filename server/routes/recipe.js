@@ -10,7 +10,7 @@ router.post("/", verifyToken, async (req, res) => {
 
   try {
 
-    // Create new recipe
+    // Create new recipe linked to logged-in user
     const newRecipe = new Recipe({
       ...req.body,
       user: req.user.id,
@@ -29,13 +29,15 @@ router.post("/", verifyToken, async (req, res) => {
       message: "Error creating recipe",
       error: err.message,
     });
+
   }
 
 });
 
 
 // ================= GET ALL RECIPES =================
-router.get("/", verifyToken, async (req, res) => {
+// Public route (no login required)
+router.get("/", async (req, res) => {
 
   try {
 
@@ -52,6 +54,7 @@ router.get("/", verifyToken, async (req, res) => {
       message: "Error fetching recipes",
       error: err.message,
     });
+
   }
 
 });
@@ -90,6 +93,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
       message: "Error deleting recipe",
       error: err.message,
     });
+
   }
 
 });
@@ -130,6 +134,7 @@ router.put("/:id", verifyToken, async (req, res) => {
       message: "Error updating recipe",
       error: err.message,
     });
+
   }
 
 });
@@ -169,6 +174,7 @@ router.post("/:id/favorite", verifyToken, async (req, res) => {
       message: "Error adding favorite",
       error: err.message,
     });
+
   }
 
 });
@@ -203,6 +209,7 @@ router.delete("/:id/favorite", verifyToken, async (req, res) => {
       message: "Error removing favorite",
       error: err.message,
     });
+
   }
 
 });
@@ -228,6 +235,7 @@ router.get("/favorites/my", verifyToken, async (req, res) => {
       message: "Error fetching favorites",
       error: err.message,
     });
+
   }
 
 });
