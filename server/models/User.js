@@ -25,9 +25,17 @@ const userSchema = new mongoose.Schema(
     // User role (authorization)
     role: {
       type: String,
-      enum: ["user", "admin"], // allowed values
-      default: "user", // default role
+      enum: ["user", "admin"], // Allowed values
+      default: "user", // Default role
     },
+
+    // User favorite recipes
+    favorites: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Recipe",
+      },
+    ],
 
     // Password reset token
     resetPasswordToken: {
@@ -44,5 +52,5 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Export model
+// Export User model
 module.exports = mongoose.model("User", userSchema);
