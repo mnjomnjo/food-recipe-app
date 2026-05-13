@@ -43,11 +43,18 @@ const recipeSchema = new mongoose.Schema(
       index: true,
     },
 
-    createdBy: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
+
+    comments: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Comment",
+      },
+    ],
   },
   { timestamps: true }
 );
