@@ -5,26 +5,20 @@ import toast from "react-hot-toast";
 import "./Favorites.css";
 
 function Favorites() {
-  const [recipes, setRecipes] = useState([]);
   const [favorites, setFavorites] = useState([]);
 
-  // LOAD FAVORITES + RECIPES
+  // LOAD FAVORITES FROM BACKEND
   useEffect(() => {
-    fetchRecipes();
-
-    const storedFav =
-      JSON.parse(localStorage.getItem("favorites")) || [];
-
-    setFavorites(storedFav);
+    fetchFavorites();
   }, []);
 
-  // GET RECIPES FROM BACKEND
-  const fetchRecipes = async () => {
+  // FETCH FAVORITES
+  const fetchFavorites = async () => {
     try {
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
-        "http://localhost:5000/api/recipes",
+        "http://localhost:5000/api/recipes/favorites/my",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -32,33 +26,41 @@ function Favorites() {
         }
       );
 
-      setRecipes(res.data);
+      setFavorites(res.data);
     } catch (err) {
       console.log(err);
+
       toast.error("Failed to load favorites");
     }
   };
 
-  // REMOVE FROM FAVORITES
-  const removeFavorite = (id) => {
-    const updated = favorites.filter(
-      (fav) => fav !== id
-    );
+  // REMOVE FAVORITE
+  const removeFavorite = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
 
-    setFavorites(updated);
+      await axios.delete(
+        `http://localhost:5000/api/recipes/${id}/favorite`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    localStorage.setItem(
-      "favorites",
-      JSON.stringify(updated)
-    );
+      const updated = favorites.filter(
+        (recipe) => recipe._id !== id
+      );
 
-    toast("Removed from favorites ❌");
+      setFavorites(updated);
+
+      toast("Removed from favorites ❌");
+    } catch (err) {
+      console.log(err);
+
+      toast.error("Failed to remove favorite");
+    }
   };
-
-  // FILTER FAVORITE RECIPES
-  const favRecipes = recipes.filter((r) =>
-    favorites.includes(r._id)
-  );
 
   return (
     <>
@@ -68,10 +70,10 @@ function Favorites() {
         <h2>My Favorite Recipes ❤️</h2>
 
         <div className="recipes-grid">
-          {favRecipes.length === 0 ? (
+          {favorites.length === 0 ? (
             <p>No favorites yet 😢</p>
           ) : (
-            favRecipes.map((recipe) => (
+            favorites.map((recipe) => (
               <div
                 key={recipe._id}
                 className="card"

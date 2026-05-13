@@ -14,14 +14,10 @@ function RecipeDetails() {
   // LOAD DATA
   useEffect(() => {
     fetchRecipe();
-
-    const storedFav =
-      JSON.parse(localStorage.getItem("favorites")) || [];
-
-    setFavorites(storedFav);
+    fetchFavorites();
   }, []);
 
-  // FETCH RECIPE FROM BACKEND
+  // FETCH RECIPE
   const fetchRecipe = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -42,30 +38,83 @@ function RecipeDetails() {
       setRecipe(foundRecipe);
     } catch (err) {
       console.log(err);
+
       toast.error("Failed to load recipe");
     }
   };
 
-  // FAVORITE LOGIC
-  const toggleFavorite = (id) => {
-    let updated;
+  // FETCH FAVORITES
+  const fetchFavorites = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-    if (favorites.includes(id)) {
-      updated = favorites.filter((fav) => fav !== id);
+      const res = await axios.get(
+        "http://localhost:5000/api/recipes/favorites/my",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      toast("Removed from favorites ❌");
-    } else {
-      updated = [...favorites, id];
+      const favoriteIds = res.data.map(
+        (recipe) => recipe._id
+      );
 
-      toast.success("Added to favorites ❤️");
+      setFavorites(favoriteIds);
+    } catch (err) {
+      console.log(err);
     }
+  };
 
-    setFavorites(updated);
+  // TOGGLE FAVORITE
+  const toggleFavorite = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
 
-    localStorage.setItem(
-      "favorites",
-      JSON.stringify(updated)
-    );
+      // REMOVE FAVORITE
+      if (favorites.includes(id)) {
+        await axios.delete(
+          `http://localhost:5000/api/recipes/${id}/favorite`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const updated = favorites.filter(
+          (fav) => fav !== id
+        );
+
+        setFavorites(updated);
+
+        toast("Removed from favorites ❌");
+      }
+
+      // ADD FAVORITE
+      else {
+        await axios.post(
+          `http://localhost:5000/api/recipes/${id}/favorite`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const updated = [...favorites, id];
+
+        setFavorites(updated);
+
+        toast.success("Added to favorites ❤️");
+      }
+    } catch (err) {
+      console.log(err);
+
+      toast.error("Favorites update failed");
+    }
   };
 
   // LOADING

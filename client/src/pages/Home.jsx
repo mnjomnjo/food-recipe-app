@@ -109,20 +109,53 @@ function Home() {
   };
 
   // FAVORITES
-  const toggleFavorite = (id) => {
-    let updated;
+  const toggleFavorite = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
 
-    if (favorites.includes(id)) {
-      updated = favorites.filter((fav) => fav !== id);
+      // REMOVE FAVORITE
+      if (favorites.includes(id)) {
+        await axios.delete(
+          `http://localhost:5000/api/recipes/${id}/favorite`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-      toast("Removed from favorites ❌");
-    } else {
-      updated = [...favorites, id];
+        const updated = favorites.filter(
+          (fav) => fav !== id
+        );
 
-      toast.success("Added to favorites ❤️");
+        setFavorites(updated);
+
+        toast("Removed from favorites ❌");
+      }
+
+      // ADD FAVORITE
+      else {
+        await axios.post(
+          `http://localhost:5000/api/recipes/${id}/favorite`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const updated = [...favorites, id];
+
+        setFavorites(updated);
+
+        toast.success("Added to favorites ❤️");
+      }
+    } catch (err) {
+      console.log(err);
+
+      toast.error("Favorites update failed");
     }
-
-    setFavorites(updated);
   };
 
   // DELETE RECIPE
