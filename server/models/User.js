@@ -20,6 +20,16 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
 
+
+    role: {
+      type: String,
+      default: "user",
+    },
+
+    resetPasswordToken: String,
+
+    resetPasswordExpire: Date,
+
     favorites: [
       {
         type: mongoose.Schema.Types.ObjectId,
