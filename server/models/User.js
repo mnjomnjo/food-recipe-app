@@ -2,21 +2,40 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
-    username: {
+    name: {
       type: String,
       required: true,
+      trim: true,
     },
 
     email: {
       type: String,
       required: true,
       unique: true,
+      lowercase: true,
     },
 
     password: {
       type: String,
       required: true,
     },
+
+
+    role: {
+      type: String,
+      default: "user",
+    },
+
+    resetPasswordToken: String,
+
+    resetPasswordExpire: Date,
+
+    favorites: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Recipe",
+      },
+    ],
   },
   { timestamps: true }
 );
