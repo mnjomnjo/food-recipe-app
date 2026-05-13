@@ -15,16 +15,13 @@ function Home() {
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // LOAD RECIPES FROM BACKEND
+  // LOAD DATA
   useEffect(() => {
     fetchRecipes();
-
-    const storedFav =
-      JSON.parse(localStorage.getItem("favorites")) || [];
-
-    setFavorites(storedFav);
+    fetchFavorites();
   }, []);
 
+  // FETCH RECIPES
   const fetchRecipes = async () => {
     try {
       setLoading(true);
@@ -43,9 +40,35 @@ function Home() {
       setRecipes(res.data);
     } catch (err) {
       console.log(err);
+
       toast.error("Failed to load recipes");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // FETCH FAVORITES
+  const fetchFavorites = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await axios.get(
+        "http://localhost:5000/api/recipes/favorites/my",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // SAVE ONLY FAVORITE IDS
+      const favoriteIds = res.data.map(
+        (recipe) => recipe._id
+      );
+
+      setFavorites(favoriteIds);
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -100,11 +123,6 @@ function Home() {
     }
 
     setFavorites(updated);
-
-    localStorage.setItem(
-      "favorites",
-      JSON.stringify(updated)
-    );
   };
 
   // DELETE RECIPE
@@ -232,7 +250,7 @@ function Home() {
           </h2>
         ) : filteredRecipes.length === 0 ? (
           <h2 className="empty-text">
-            No recipes found 
+            No recipes found
           </h2>
         ) : (
           <div className="recipes-grid">
