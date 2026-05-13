@@ -158,7 +158,7 @@ router.post("/login", async (req, res) => {
     // Send login response
     res.status(200).json({
       message: "Login successful",
-      accessToken,
+      token: accessToken,
     });
 
   } catch (err) {
@@ -211,7 +211,7 @@ router.post("/refresh", (req, res) => {
 
     // Send new access token
     res.status(200).json({
-      accessToken: newAccessToken,
+      token: newAccessToken,
     });
 
   });
