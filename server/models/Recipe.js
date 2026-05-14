@@ -1,12 +1,12 @@
-// Import mongoose
 const mongoose = require("mongoose");
 
-// Create recipe schema
 const recipeSchema = new mongoose.Schema(
   {
     title: {
       type: String,
       required: true,
+      trim: true,
+      index: true,
     },
 
     description: {
@@ -19,10 +19,17 @@ const recipeSchema = new mongoose.Schema(
       type: String,
     },
 
-    ingredients: {
-      type: [String],
-      required: true,
+    image: {
+      type: String,
+      default: "",
     },
+
+    ingredients: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
 
     instructions: {
       type: String,
@@ -31,8 +38,7 @@ const recipeSchema = new mongoose.Schema(
 
     calories: {
       type: Number,
-      required: true,
-      min: 0,
+      default: 0,
     },
 
     rating: {
@@ -42,14 +48,31 @@ const recipeSchema = new mongoose.Schema(
       max: 5,
     },
 
+    category: {
+      type: String,
+      index: true,
+    },
+
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
+
+    comments: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Comment",
+      },
+    ],
   },
   { timestamps: true }
 );
 
-// Export model
+recipeSchema.index({
+  title: "text",
+  description: "text",
+  ingredients: "text",
+});
+
 module.exports = mongoose.model("Recipe", recipeSchema);
