@@ -1,13 +1,16 @@
 const mongoose = require("mongoose");
 
+// User schema
 const userSchema = new mongoose.Schema(
   {
+    // Display name (register sends `username` → stored as `name` in auth route)
     name: {
       type: String,
       required: true,
       trim: true,
     },
 
+    // User email
     email: {
       type: String,
       required: true,
@@ -15,14 +18,16 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
     },
 
+    // Hashed password
     password: {
       type: String,
       required: true,
     },
 
-
+    // User role (authorization)
     role: {
       type: String,
+      enum: ["user", "admin"],
       default: "user",
     },
 
@@ -37,7 +42,10 @@ const userSchema = new mongoose.Schema(
       },
     ],
   },
+
+  // Automatically add createdAt and updatedAt
   { timestamps: true }
 );
 
+// Export model
 module.exports = mongoose.model("User", userSchema);

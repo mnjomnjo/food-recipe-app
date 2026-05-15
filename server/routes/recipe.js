@@ -3,7 +3,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const Recipe = require("../models/Recipe");
 const User = require("../models/User");
-const verifyToken = require("../middleware/authMiddleware");
+const { verifyToken } = require("../middleware/authMiddleware");
 
 // Create recipe
 router.post("/", verifyToken, async (req, res) => {
