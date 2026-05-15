@@ -21,9 +21,9 @@ router.post("/register", async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create new user with hashed password
+    // Create new user with hashed password (schema field is `name`, not `username`)
     const newUser = new User({
-      username,
+      name: username,
       email,
       password: hashedPassword,
     });
