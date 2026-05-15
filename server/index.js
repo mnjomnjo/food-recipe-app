@@ -4,6 +4,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const cookieParser = require("cookie-parser");
 
 // Security packages
 const helmet = require("helmet");
@@ -48,6 +49,10 @@ app.use(cors());
 
 // Parse JSON request bodies
 app.use(express.json());
+
+// Parse cookies
+app.use(cookieParser());
+
 
 // =========================
 // API Routes
