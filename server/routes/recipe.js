@@ -5,7 +5,7 @@ const Recipe = require("../models/Recipe");
 const User = require("../models/User");
 const { verifyToken } = require("../middleware/authMiddleware");
 
-// Create recipe
+// ================= CREATE RECIPE =================
 router.post("/", verifyToken, async (req, res) => {
   try {
     const newRecipe = new Recipe({
@@ -23,7 +23,7 @@ router.post("/", verifyToken, async (req, res) => {
   }
 });
 
-// Get statistics for user's recipes
+// ================= USER RECIPE STATS =================
 router.get("/stats", verifyToken, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -75,11 +75,10 @@ router.get("/stats", verifyToken, async (req, res) => {
   }
 });
 
-// Get my favorite recipes
+// ================= GET MY FAVORITES =================
 router.get("/favorites/my", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).populate("favorites");
-
     res.status(200).json(user.favorites);
   } catch (err) {
     res.status(500).json({
@@ -89,7 +88,7 @@ router.get("/favorites/my", verifyToken, async (req, res) => {
   }
 });
 
-// Get recipes for logged-in user with optional search and calorie filter
+// ================= LIST MY RECIPES (search / calories) =================
 router.get("/", verifyToken, async (req, res) => {
   try {
     const { search, calories } = req.query;
@@ -115,7 +114,6 @@ router.get("/", verifyToken, async (req, res) => {
     }
 
     const recipes = await Recipe.find(query).sort({ createdAt: -1 });
-
     res.status(200).json(recipes);
   } catch (err) {
     res.status(500).json({
@@ -125,7 +123,7 @@ router.get("/", verifyToken, async (req, res) => {
   }
 });
 
-// Rate a recipe
+// ================= RATE RECIPE =================
 router.post("/:id/rate", verifyToken, async (req, res) => {
   try {
     const { rating } = req.body;
@@ -159,7 +157,7 @@ router.post("/:id/rate", verifyToken, async (req, res) => {
   }
 });
 
-// Add recipe to favorites
+// ================= ADD TO FAVORITES =================
 router.post("/:id/favorite", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -185,7 +183,7 @@ router.post("/:id/favorite", verifyToken, async (req, res) => {
   }
 });
 
-// Remove recipe from favorites
+// ================= REMOVE FROM FAVORITES =================
 router.delete("/:id/favorite", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -208,7 +206,7 @@ router.delete("/:id/favorite", verifyToken, async (req, res) => {
   }
 });
 
-// Delete recipe
+// ================= DELETE RECIPE =================
 router.delete("/:id", verifyToken, async (req, res) => {
   try {
     const recipe = await Recipe.findOne({
@@ -235,7 +233,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
   }
 });
 
-// Update recipe
+// ================= UPDATE RECIPE =================
 router.put("/:id", verifyToken, async (req, res) => {
   try {
     const recipe = await Recipe.findOne({
