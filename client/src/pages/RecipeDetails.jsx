@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api/api";
 import Navbar from "../components/Navbar";
 import toast from "react-hot-toast";
 import "./RecipeDetails.css";
@@ -20,16 +20,7 @@ function RecipeDetails() {
   // FETCH RECIPE
   const fetchRecipe = async () => {
     try {
-      const token = localStorage.getItem("token");
-
-      const res = await axios.get(
-        "http://localhost:5000/api/recipes",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await api.get("/api/recipes");
 
       const foundRecipe = res.data.find(
         (r) => r._id === id
@@ -46,16 +37,7 @@ function RecipeDetails() {
   // FETCH FAVORITES
   const fetchFavorites = async () => {
     try {
-      const token = localStorage.getItem("token");
-
-      const res = await axios.get(
-        "http://localhost:5000/api/recipes/favorites/my",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await api.get("/api/recipes/favorites/my");
 
       const favoriteIds = res.data.map(
         (recipe) => recipe._id
@@ -70,18 +52,9 @@ function RecipeDetails() {
   // TOGGLE FAVORITE
   const toggleFavorite = async (id) => {
     try {
-      const token = localStorage.getItem("token");
-
       // REMOVE FAVORITE
       if (favorites.includes(id)) {
-        await axios.delete(
-          `http://localhost:5000/api/recipes/${id}/favorite`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        await api.delete(`/api/recipes/${id}/favorite`);
 
         const updated = favorites.filter(
           (fav) => fav !== id
@@ -94,15 +67,7 @@ function RecipeDetails() {
 
       // ADD FAVORITE
       else {
-        await axios.post(
-          `http://localhost:5000/api/recipes/${id}/favorite`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        await api.post(`/api/recipes/${id}/favorite`, {});
 
         const updated = [...favorites, id];
 

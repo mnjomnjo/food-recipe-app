@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api/api";
 import Navbar from "../components/Navbar";
 import toast from "react-hot-toast";
 import "./AddRecipe.css";
@@ -34,8 +34,6 @@ function AddRecipe() {
     }
 
     try {
-      const token = localStorage.getItem("token");
-
       const recipeData = {
         title: formData.title,
         description: formData.description,
@@ -51,15 +49,7 @@ function AddRecipe() {
         instructions: formData.instructions,
       };
 
-      await axios.post(
-        "http://localhost:5000/api/recipes",
-        recipeData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await api.post("/api/recipes", recipeData);
 
       toast.success("Recipe added successfully ✅");
 

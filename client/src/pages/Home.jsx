@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api/api";
 import Navbar from "../components/Navbar";
 import toast from "react-hot-toast";
 import "./Home.css";
@@ -26,16 +26,7 @@ function Home() {
     try {
       setLoading(true);
 
-      const token = localStorage.getItem("token");
-
-      const res = await axios.get(
-        "http://localhost:5000/api/recipes",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await api.get("/api/recipes");
 
       setRecipes(res.data);
     } catch (err) {
@@ -50,16 +41,7 @@ function Home() {
   // FETCH FAVORITES
   const fetchFavorites = async () => {
     try {
-      const token = localStorage.getItem("token");
-
-      const res = await axios.get(
-        "http://localhost:5000/api/recipes/favorites/my",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await api.get("/api/recipes/favorites/my");
 
       // SAVE ONLY FAVORITE IDS
       const favoriteIds = res.data.map(
@@ -75,17 +57,7 @@ function Home() {
   // RATING
   const handleRating = async (id, rating) => {
     try {
-      const token = localStorage.getItem("token");
-
-      await axios.post(
-        `http://localhost:5000/api/recipes/${id}/rate`,
-        { rating },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await api.post(`/api/recipes/${id}/rate`, { rating });
 
       // UPDATE LOCAL STATE
       setRatings({
@@ -111,18 +83,9 @@ function Home() {
   // FAVORITES
   const toggleFavorite = async (id) => {
     try {
-      const token = localStorage.getItem("token");
-
       // REMOVE FAVORITE
       if (favorites.includes(id)) {
-        await axios.delete(
-          `http://localhost:5000/api/recipes/${id}/favorite`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        await api.delete(`/api/recipes/${id}/favorite`);
 
         const updated = favorites.filter(
           (fav) => fav !== id
@@ -135,15 +98,7 @@ function Home() {
 
       // ADD FAVORITE
       else {
-        await axios.post(
-          `http://localhost:5000/api/recipes/${id}/favorite`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        await api.post(`/api/recipes/${id}/favorite`, {});
 
         const updated = [...favorites, id];
 
@@ -161,16 +116,7 @@ function Home() {
   // DELETE RECIPE
   const deleteRecipe = async (id) => {
     try {
-      const token = localStorage.getItem("token");
-
-      await axios.delete(
-        `http://localhost:5000/api/recipes/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await api.delete(`/api/recipes/${id}`);
 
       const updated = recipes.filter(
         (r) => r._id !== id

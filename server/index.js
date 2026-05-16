@@ -44,8 +44,13 @@ app.use(limiter);
 // General Middlewares
 // =========================
 
-// Enable Cross-Origin Resource Sharing
-app.use(cors());
+// Enable Cross-Origin Resource Sharing (credentials required for refresh cookie)
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    credentials: true,
+  })
+);
 
 // Parse JSON request bodies
 app.use(express.json());

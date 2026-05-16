@@ -1,12 +1,19 @@
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import api from "../api/api";
 import "./Navbar.css";
 
 function Navbar() {
   const navigate = useNavigate();
 
   // LOGOUT
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await api.post("/api/auth/logout");
+    } catch (err) {
+      console.log(err);
+    }
+
     localStorage.removeItem("token");
 
     toast.success("Logged out successfully ✅");

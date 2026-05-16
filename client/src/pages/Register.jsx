@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../api/api";
 import { Link } from "react-router-dom";
 import "./Auth.css";
 
@@ -12,7 +12,7 @@ function Register() {
     e.preventDefault();
 
     try {
-      await axios.post("http://localhost:5000/api/auth/register", {
+      await api.post("/api/auth/register", {
         username,
         email,
         password,

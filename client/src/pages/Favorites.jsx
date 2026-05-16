@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api/api";
 import Navbar from "../components/Navbar";
 import toast from "react-hot-toast";
 import "./Favorites.css";
@@ -15,16 +15,7 @@ function Favorites() {
   // FETCH FAVORITES
   const fetchFavorites = async () => {
     try {
-      const token = localStorage.getItem("token");
-
-      const res = await axios.get(
-        "http://localhost:5000/api/recipes/favorites/my",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await api.get("/api/recipes/favorites/my");
 
       setFavorites(res.data);
     } catch (err) {
@@ -37,16 +28,7 @@ function Favorites() {
   // REMOVE FAVORITE
   const removeFavorite = async (id) => {
     try {
-      const token = localStorage.getItem("token");
-
-      await axios.delete(
-        `http://localhost:5000/api/recipes/${id}/favorite`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await api.delete(`/api/recipes/${id}/favorite`);
 
       const updated = favorites.filter(
         (recipe) => recipe._id !== id
