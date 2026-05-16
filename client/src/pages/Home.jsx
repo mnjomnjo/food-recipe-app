@@ -43,9 +43,9 @@ function Home() {
     try {
       const res = await api.get("/api/recipes/favorites/my");
 
-      // SAVE ONLY FAVORITE IDS
-      const favoriteIds = res.data.map(
-        (recipe) => recipe._id
+      // SAVE ONLY FAVORITE IDS (normalize to strings for reliable comparisons)
+      const favoriteIds = (res.data || []).map((recipe) =>
+        String(recipe._id)
       );
 
       setFavorites(favoriteIds);
@@ -82,13 +82,15 @@ function Home() {
 
   // FAVORITES
   const toggleFavorite = async (id) => {
+    const recipeId = String(id);
+
     try {
       // REMOVE FAVORITE
-      if (favorites.includes(id)) {
-        await api.delete(`/api/recipes/${id}/favorite`);
+      if (favorites.includes(recipeId)) {
+        await api.delete(`/api/recipes/${recipeId}/favorite`);
 
         const updated = favorites.filter(
-          (fav) => fav !== id
+          (fav) => fav !== recipeId
         );
 
         setFavorites(updated);
@@ -98,9 +100,9 @@ function Home() {
 
       // ADD FAVORITE
       else {
-        await api.post(`/api/recipes/${id}/favorite`, {});
+        await api.post(`/api/recipes/${recipeId}/favorite`, {});
 
-        const updated = [...favorites, id];
+        const updated = [...favorites, recipeId];
 
         setFavorites(updated);
 
@@ -109,7 +111,12 @@ function Home() {
     } catch (err) {
       console.log(err);
 
-      toast.error("Favorites update failed");
+      const data = err.response?.data;
+      const message = data?.error
+        ? `${data.message}: ${data.error}`
+        : data?.message || "Favorites update failed";
+
+      toast.error(message);
     }
   };
 
@@ -265,7 +272,7 @@ function Home() {
                   }}
                   style={{
                     color: favorites.includes(
-                      recipe._id
+                      String(recipe._id)
                     )
                       ? "red"
                       : "#999",

@@ -39,8 +39,8 @@ function RecipeDetails() {
     try {
       const res = await api.get("/api/recipes/favorites/my");
 
-      const favoriteIds = res.data.map(
-        (recipe) => recipe._id
+      const favoriteIds = (res.data || []).map((recipe) =>
+        String(recipe._id)
       );
 
       setFavorites(favoriteIds);
@@ -51,13 +51,15 @@ function RecipeDetails() {
 
   // TOGGLE FAVORITE
   const toggleFavorite = async (id) => {
+    const recipeId = String(id);
+
     try {
       // REMOVE FAVORITE
-      if (favorites.includes(id)) {
-        await api.delete(`/api/recipes/${id}/favorite`);
+      if (favorites.includes(recipeId)) {
+        await api.delete(`/api/recipes/${recipeId}/favorite`);
 
         const updated = favorites.filter(
-          (fav) => fav !== id
+          (fav) => fav !== recipeId
         );
 
         setFavorites(updated);
@@ -67,9 +69,9 @@ function RecipeDetails() {
 
       // ADD FAVORITE
       else {
-        await api.post(`/api/recipes/${id}/favorite`, {});
+        await api.post(`/api/recipes/${recipeId}/favorite`, {});
 
-        const updated = [...favorites, id];
+        const updated = [...favorites, recipeId];
 
         setFavorites(updated);
 
@@ -78,7 +80,12 @@ function RecipeDetails() {
     } catch (err) {
       console.log(err);
 
-      toast.error("Favorites update failed");
+      const data = err.response?.data;
+      const message = data?.error
+        ? `${data.message}: ${data.error}`
+        : data?.message || "Favorites update failed";
+
+      toast.error(message);
     }
   };
 
@@ -114,12 +121,12 @@ function RecipeDetails() {
             toggleFavorite(recipe._id)
           }
           style={{
-            background: favorites.includes(recipe._id)
+            background: favorites.includes(String(recipe._id))
               ? "#ff4d4d"
               : "#ff7a7a",
           }}
         >
-          {favorites.includes(recipe._id)
+          {favorites.includes(String(recipe._id))
             ? "❤️ Remove from Favorites"
             : "❤️ Add to Favorites"}
         </button>

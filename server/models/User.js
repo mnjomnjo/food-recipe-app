@@ -35,12 +35,15 @@ const userSchema = new mongoose.Schema(
 
     resetPasswordExpire: Date,
 
-    favorites: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Recipe",
-      },
-    ],
+    favorites: {
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Recipe",
+        },
+      ],
+      default: [],
+    },
   },
 
   // Automatically add createdAt and updatedAt

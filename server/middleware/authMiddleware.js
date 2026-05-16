@@ -18,8 +18,11 @@ const verifyToken = (req, res, next) => {
     // Verify token
     const verified = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Attach decoded user data to request
-    req.user = verified;
+    // Attach decoded user data to request (support id or _id in token payload)
+    req.user = {
+      ...verified,
+      id: verified.id || verified._id,
+    };
 
     // Continue to next middleware or route
     next();

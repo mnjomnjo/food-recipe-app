@@ -103,14 +103,28 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    // Find user by email
-    const user = await User.findOne({ email });
+    // Find user by email (lean keeps legacy `username` field from old documents)
+    const user = await User.findOne({ email }).lean();
 
     // Check if user exists
     if (!user) {
       return res.status(400).json({
         message: "User not found",
       });
+    }
+
+    // Fix legacy accounts that have `username` but no `name` in MongoDB
+    if (!user.name) {
+      const legacyName =
+        user.username ||
+        (user.email ? user.email.split("@")[0] : "User");
+
+      await User.collection.updateOne(
+        { _id: user._id },
+        { $set: { name: legacyName } }
+      );
+
+      user.name = legacyName;
     }
 
     // Compare entered password with hashed password

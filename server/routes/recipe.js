@@ -5,12 +5,27 @@ const Recipe = require("../models/Recipe");
 const User = require("../models/User");
 const { verifyToken } = require("../middleware/authMiddleware");
 
+const getUserId = (req) => req.user?.id || req.user?._id;
+
+// Use native driver updates so legacy users missing `name` are not blocked by full-document validation
+const addFavoriteForUser = (userId, recipeObjectId) =>
+  User.collection.updateOne(
+    { _id: new mongoose.Types.ObjectId(userId) },
+    { $addToSet: { favorites: recipeObjectId } }
+  );
+
+const removeFavoriteForUser = (userId, recipeObjectId) =>
+  User.collection.updateOne(
+    { _id: new mongoose.Types.ObjectId(userId) },
+    { $pull: { favorites: recipeObjectId } }
+  );
+
 // ================= CREATE RECIPE =================
 router.post("/", verifyToken, async (req, res) => {
   try {
     const newRecipe = new Recipe({
       ...req.body,
-      user: req.user.id,
+      user: getUserId(req),
     });
 
     const savedRecipe = await newRecipe.save();
@@ -26,7 +41,7 @@ router.post("/", verifyToken, async (req, res) => {
 // ================= USER RECIPE STATS =================
 router.get("/stats", verifyToken, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = getUserId(req);
 
     const totalRecipes = await Recipe.countDocuments({ user: userId });
 
@@ -78,9 +93,37 @@ router.get("/stats", verifyToken, async (req, res) => {
 // ================= GET MY FAVORITES =================
 router.get("/favorites/my", verifyToken, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).populate("favorites");
-    res.status(200).json(user.favorites);
+    const userId = getUserId(req);
+
+    if (!userId) {
+      return res.status(401).json({
+        message: "Invalid token payload",
+      });
+    }
+
+    const user = await User.findById(userId).select("favorites").lean();
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    const favoriteIds = (user.favorites || [])
+      .map((id) => id?.toString())
+      .filter((id) => id && mongoose.Types.ObjectId.isValid(id));
+
+    if (favoriteIds.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    const recipes = await Recipe.find({
+      _id: { $in: favoriteIds },
+    }).sort({ createdAt: -1 });
+
+    res.status(200).json(recipes);
   } catch (err) {
+    console.error("Get favorites error:", err);
     res.status(500).json({
       message: "Error fetching favorites",
       error: err.message,
@@ -94,7 +137,7 @@ router.get("/", verifyToken, async (req, res) => {
     const { search, calories } = req.query;
 
     const query = {
-      user: req.user.id,
+      user: getUserId(req),
     };
 
     if (search) {
@@ -160,22 +203,44 @@ router.post("/:id/rate", verifyToken, async (req, res) => {
 // ================= ADD TO FAVORITES =================
 router.post("/:id/favorite", verifyToken, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    const userId = getUserId(req);
+    const recipeId = req.params.id;
 
-    if (user.favorites.includes(req.params.id)) {
-      return res.status(400).json({
-        message: "Recipe already in favorites",
+    if (!userId) {
+      return res.status(401).json({
+        message: "Invalid token payload",
       });
     }
 
-    user.favorites.push(req.params.id);
-    await user.save();
+    if (!mongoose.Types.ObjectId.isValid(recipeId)) {
+      return res.status(400).json({
+        message: "Invalid recipe id",
+      });
+    }
+
+    const recipeExists = await Recipe.exists({ _id: recipeId });
+
+    if (!recipeExists) {
+      return res.status(404).json({
+        message: "Recipe not found",
+      });
+    }
+
+    const recipeObjectId = new mongoose.Types.ObjectId(recipeId);
+
+    const result = await addFavoriteForUser(userId, recipeObjectId);
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
 
     res.status(200).json({
       message: "Recipe added to favorites",
-      favorites: user.favorites,
     });
   } catch (err) {
+    console.error("Add favorite error:", err);
     res.status(500).json({
       message: "Error adding favorite",
       error: err.message,
@@ -186,19 +251,36 @@ router.post("/:id/favorite", verifyToken, async (req, res) => {
 // ================= REMOVE FROM FAVORITES =================
 router.delete("/:id/favorite", verifyToken, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    const userId = getUserId(req);
+    const recipeId = req.params.id;
 
-    user.favorites = user.favorites.filter(
-      (fav) => fav.toString() !== req.params.id
-    );
+    if (!userId) {
+      return res.status(401).json({
+        message: "Invalid token payload",
+      });
+    }
 
-    await user.save();
+    if (!mongoose.Types.ObjectId.isValid(recipeId)) {
+      return res.status(400).json({
+        message: "Invalid recipe id",
+      });
+    }
+
+    const recipeObjectId = new mongoose.Types.ObjectId(recipeId);
+
+    const result = await removeFavoriteForUser(userId, recipeObjectId);
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
 
     res.status(200).json({
       message: "Recipe removed from favorites",
-      favorites: user.favorites,
     });
   } catch (err) {
+    console.error("Remove favorite error:", err);
     res.status(500).json({
       message: "Error removing favorite",
       error: err.message,
@@ -211,7 +293,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
   try {
     const recipe = await Recipe.findOne({
       _id: req.params.id,
-      user: req.user.id,
+      user: getUserId(req),
     });
 
     if (!recipe) {
@@ -238,7 +320,7 @@ router.put("/:id", verifyToken, async (req, res) => {
   try {
     const recipe = await Recipe.findOne({
       _id: req.params.id,
-      user: req.user.id,
+      user: getUserId(req),
     });
 
     if (!recipe) {
