@@ -57,7 +57,7 @@ router.post("/register", async (req, res) => {
     // Generate salt for password hashing
     const salt = await bcrypt.genSalt(10);
 
-    // Hash password
+    // Hash password .........................................
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Create new user
@@ -123,7 +123,7 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    // Create access token
+    // Create access token......................................
     const accessToken = jwt.sign(
       {
         id: user._id,

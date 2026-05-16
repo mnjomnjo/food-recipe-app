@@ -2,7 +2,11 @@ const express = require("express");
 const router = express.Router();
 const Recipe = require("../models/Recipe");
 const User = require("../models/User");
-const { verifyToken } = require("../middleware/authMiddleware");
+
+const {
+  verifyToken,
+  verifyAdmin,
+} = require("../middleware/authMiddleware");
 
 
 // ================= CREATE RECIPE =================
@@ -239,6 +243,42 @@ router.get("/favorites/my", verifyToken, async (req, res) => {
   }
 
 });
+
+
+// ================= ADMIN STATISTICS =================
+router.get(
+  "/admin/stats",
+  verifyToken,
+  verifyAdmin,
+  async (req, res) => {
+
+    try {
+
+      // Count total recipes
+      const totalRecipes = await Recipe.countDocuments();
+
+      // Count total users
+      const totalUsers = await User.countDocuments();
+
+      // Send statistics response
+      res.status(200).json({
+        message: "Admin statistics fetched successfully",
+        totalRecipes,
+        totalUsers,
+      });
+
+    } catch (err) {
+
+      // Handle server errors
+      res.status(500).json({
+        message: "Error fetching statistics",
+        error: err.message,
+      });
+
+    }
+
+  }
+);
 
 
 // Export router

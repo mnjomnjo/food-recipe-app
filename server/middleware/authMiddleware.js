@@ -1,7 +1,7 @@
 // Import JWT package
 const jwt = require("jsonwebtoken");
 
-// Middleware to verify JWT token
+// Middleware to verify JWT token.....................................
 const verifyToken = (req, res, next) => {
   // Get authorization header
   const authHeader = req.headers.authorization;
