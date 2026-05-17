@@ -1,0 +1,35 @@
+.stats-container {
+  padding: 40px;
+  text-align: center;
+}
+
+.stats-container h1 {
+  margin-bottom: 40px;
+  color: #333;
+}
+
+.stats-grid {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  width: 220px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card h2 {
+  font-size: 40px;
+  color: #ff6b6b;
+  margin-bottom: 10px;
+}
+
+.stat-card p {
+  color: #555;
+  font-size: 18px;
+}

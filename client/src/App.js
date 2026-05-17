@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+} from "react-router-dom";
+
 import { Toaster } from "react-hot-toast";
 
 import Login from "./pages/Login";
@@ -8,6 +13,7 @@ import RecipeDetails from "./pages/RecipeDetails";
 import AddRecipe from "./pages/AddRecipe";
 import Favorites from "./pages/Favorites";
 import About from "./pages/About";
+import AdminStats from "./pages/AdminStats";
 
 function App() {
   return (
@@ -30,7 +36,10 @@ function App() {
           element={<RecipeDetails />}
         />
 
-        <Route path="/add" element={<AddRecipe />} />
+        <Route
+          path="/add"
+          element={<AddRecipe />}
+        />
 
         <Route
           path="/favorites"
@@ -38,6 +47,11 @@ function App() {
         />
 
         <Route path="/about" element={<About />} />
+
+        <Route
+          path="/admin/stats"
+          element={<AdminStats />}
+        />
       </Routes>
     </Router>
   );

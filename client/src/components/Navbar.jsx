@@ -33,6 +33,10 @@ function Navbar() {
           About
         </Link>
 
+        <Link to="/admin/stats">
+          Admin Stats
+        </Link>
+
         <button
           className="logout-btn"
           onClick={handleLogout}
