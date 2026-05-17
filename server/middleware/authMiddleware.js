@@ -1,9 +1,9 @@
-// Import JWT
+// Import JWT package
 const jwt = require("jsonwebtoken");
 
-// Middleware to verify token
+// Middleware to verify JWT token.....................................
 const verifyToken = (req, res, next) => {
-  // Get token from headers
+  // Get authorization header
   const authHeader = req.headers.authorization;
 
   // Check if token exists
@@ -12,19 +12,37 @@ const verifyToken = (req, res, next) => {
   }
 
   try {
-    // Extract token (Bearer TOKEN)
+    // Extract token from "Bearer TOKEN"
     const token = authHeader.split(" ")[1];
 
     // Verify token
     const verified = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Attach user info to request
+    // Attach decoded user data to request
     req.user = verified;
 
-    next(); // move to next function
+    // Continue to next middleware or route
+    next();
+
   } catch (err) {
-    res.status(400).json("Invalid token");
+    return res.status(401).json({
+  message: "Invalid token",
+});
   }
 };
 
-module.exports = verifyToken;
+// Middleware to check admin role
+const verifyAdmin = (req, res, next) => {
+  // Check if user role is admin
+  if (req.user.role !== "admin") {
+    return res.status(403).json("Access denied. Admins only");
+  }
+
+  next();
+};
+
+// Export middlewares
+module.exports = {
+  verifyToken,
+  verifyAdmin,
+};

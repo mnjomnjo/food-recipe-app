@@ -4,24 +4,74 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
-const verifyToken = require("./middleware/authMiddleware");
+const cookieParser = require("cookie-parser");
+
+// Security packages
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+
+// Middleware
+const { verifyToken, verifyAdmin } = require("./middleware/authMiddleware");
+
+// Models
+const User = require("./models/User");
+const Recipe = require("./models/Recipe");
+
+// Routes
+const authRoute = require("./routes/auth");
 const recipeRoute = require("./routes/recipe");
 
 // Initialize Express app
 const app = express();
 
-// Import routes
-const authRoute = require("./routes/auth");
 
-// Middlewares
-app.use(cors()); // Enable Cross-Origin Resource Sharing
-app.use(express.json()); // Parse JSON request bodies
+// =========================
+// Security Middlewares
+// =========================
 
-// Routes
-app.use("/api/auth", authRoute); // Authentication routes
+// Enable secure HTTP headers
+app.use(helmet());
+
+// Prevent too many requests from the same IP
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests
+  message: "Too many requests, please try again later.",
+});
+
+app.use(limiter);
+
+
+// =========================
+// General Middlewares
+// =========================
+
+// Enable Cross-Origin Resource Sharing
+app.use(cors());
+
+// Parse JSON request bodies
+app.use(express.json());
+
+// Parse cookies
+app.use(cookieParser());
+
+
+// =========================
+// API Routes
+// =========================
+
+// Authentication routes
+app.use("/api/auth", authRoute);
+
+// Recipe routes
 app.use("/api/recipes", recipeRoute);
 
-// Protected route (only logged-in users can access)
+
+// =========================
+// Protected Routes
+// =========================
+
+// Only authenticated users can access this route
 app.get("/api/protected", verifyToken, (req, res) => {
   res.json({
     message: "You are authorized",
@@ -29,15 +79,62 @@ app.get("/api/protected", verifyToken, (req, res) => {
   });
 });
 
+// Admin-only route
+app.get("/api/admin", verifyToken, verifyAdmin, (req, res) => {
+  res.json({
+    message: "Welcome Admin 🔥",
+  });
+});
+
+// Admin statistics route
+app.get("/api/stats", verifyToken, verifyAdmin, async (req, res) => {
+  try {
+
+    // Count total users
+    const totalUsers = await User.countDocuments();
+
+    // Count total recipes
+    const totalRecipes = await Recipe.countDocuments();
+
+    // Send statistics response
+    res.status(200).json({
+      totalUsers,
+      totalRecipes,
+    });
+
+  } catch (err) {
+
+    res.status(500).json({
+      message: "Error fetching statistics",
+      error: err.message,
+    });
+  }
+});
+
+
+// =========================
+// Database Connection
+// =========================
+
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected ✅"))
-  .catch(err => console.log(err));
+  .catch((err) => console.log(err));
 
-// Test route
+
+// =========================
+// Test Route
+// =========================
+
+// Simple test route
 app.get("/", (req, res) => {
   res.send("API is running...");
 });
+
+
+// =========================
+// Start Server
+// =========================
 
 // Define server port
 const PORT = process.env.PORT || 5000;
