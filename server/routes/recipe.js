@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const Recipe = require("../models/Recipe");
 const User = require("../models/User");
 const verifyToken = require("../middleware/authMiddleware");
+
 // Create recipe
 router.post("/", verifyToken, async (req, res) => {
   try {
@@ -88,14 +89,12 @@ router.get("/favorites/my", verifyToken, async (req, res) => {
   }
 });
 
-// Get recipes for logged-in user with optional search and calorie filter
-router.get("/", verifyToken, async (req, res) => {
+// Get all recipes with optional search, calorie filter, and category filter
+router.get("/", async (req, res) => {
   try {
-    const { search, calories } = req.query;
+    const { search, calories, category } = req.query;
 
-    const query = {
-      user: req.user.id,
-    };
+    const query = {};
 
     if (search) {
       query.$or = [
@@ -111,6 +110,10 @@ router.get("/", verifyToken, async (req, res) => {
       query.calories = { $gte: 300, $lte: 600 };
     } else if (calories === "high") {
       query.calories = { $gt: 600 };
+    }
+
+    if (category) {
+      query.category = { $regex: category, $options: "i" };
     }
 
     const recipes = await Recipe.find(query).sort({ createdAt: -1 });
