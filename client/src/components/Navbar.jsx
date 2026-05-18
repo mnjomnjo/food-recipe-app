@@ -11,7 +11,7 @@ function Navbar() {
 
     toast.success("Logged out successfully ✅");
 
-    navigate("/");
+    window.location.href = "/";
   };
 
   return (
@@ -19,7 +19,10 @@ function Navbar() {
       <h2 className="logo">MyRecipes</h2>
 
       <div className="nav-links">
-        <Link to="/home">Home</Link>
+
+        <Link to="/home">
+          Home
+        </Link>
 
         <Link to="/favorites">
           Favorites
@@ -43,6 +46,7 @@ function Navbar() {
         >
           Logout
         </button>
+
       </div>
     </nav>
   );

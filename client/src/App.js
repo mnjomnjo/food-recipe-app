@@ -2,7 +2,10 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
+  Navigate,
 } from "react-router-dom";
+
+import { jwtDecode } from "jwt-decode";
 
 import { Toaster } from "react-hot-toast";
 
@@ -16,45 +19,116 @@ import About from "./pages/About";
 import AdminStats from "./pages/AdminStats";
 
 function App() {
+
+  // CHECK TOKEN
+  const token = localStorage.getItem("token");
+
+  // CHECK LOGIN
+  const isAuthenticated = !!token;
+
+  // CHECK ADMIN
+  let isAdmin = false;
+
+  try {
+
+    if (token) {
+      const decoded = jwtDecode(token);
+
+      isAdmin = decoded.role === "admin";
+    }
+
+  } catch (err) {
+    console.log(err);
+  }
+
   return (
     <Router>
-      {/* Toast Container */}
+
+      {/* TOASTER */}
       <Toaster position="top-right" />
 
       <Routes>
-        <Route path="/" element={<Login />} />
 
+        {/* LOGIN */}
+        <Route
+          path="/"
+          element={
+            isAuthenticated
+              ? <Navigate to="/home" />
+              : <Login />
+          }
+        />
+
+        {/* REGISTER */}
         <Route
           path="/register"
-          element={<Register />}
+          element={
+            isAuthenticated
+              ? <Navigate to="/home" />
+              : <Register />
+          }
         />
 
-        <Route path="/home" element={<Home />} />
+        {/* HOME */}
+        <Route
+          path="/home"
+          element={
+            isAuthenticated
+              ? <Home />
+              : <Navigate to="/" />
+          }
+        />
 
+        {/* DETAILS */}
         <Route
           path="/recipe/:id"
-          element={<RecipeDetails />}
+          element={
+            isAuthenticated
+              ? <RecipeDetails />
+              : <Navigate to="/" />
+          }
         />
 
+        {/* ADD RECIPE */}
         <Route
           path="/add"
-          element={<AddRecipe />}
+          element={
+            isAuthenticated
+              ? <AddRecipe />
+              : <Navigate to="/" />
+          }
         />
 
+        {/* FAVORITES */}
         <Route
           path="/favorites"
-          element={<Favorites />}
+          element={
+            isAuthenticated
+              ? <Favorites />
+              : <Navigate to="/" />
+          }
         />
 
+        {/* ABOUT */}
         <Route
           path="/about"
-          element={<About />}
+          element={
+            isAuthenticated
+              ? <About />
+              : <Navigate to="/" />
+          }
         />
 
+        {/* ADMIN ONLY */}
         <Route
           path="/admin/stats"
-          element={<AdminStats />}
+          element={
+            isAuthenticated && isAdmin
+              ? <AdminStats />
+              : <Navigate to="/home" />
+          }
         />
+
       </Routes>
     </Router>
   );
