@@ -5,8 +5,6 @@ import {
   Navigate,
 } from "react-router-dom";
 
-import { jwtDecode } from "jwt-decode";
-
 import { Toaster } from "react-hot-toast";
 
 import Login from "./pages/Login";
@@ -25,26 +23,6 @@ function App() {
 
   // CHECK LOGIN
   const isAuthenticated = !!token;
-
-  // CHECK ADMIN
-  let isAdmin = false;
-
-  try {
-
-    if (token) {
-
-      const decoded = jwtDecode(token);
-
-      isAdmin =
-        decoded.role === "admin";
-    }
-
-  } catch (err) {
-
-    console.log(err);
-
-    localStorage.removeItem("token");
-  }
 
   return (
     <Router>
@@ -124,13 +102,13 @@ function App() {
           }
         />
 
-        {/* ADMIN ONLY */}
+        {/* Admin stats: AdminStats shows Access Denied for non-admins */}
         <Route
           path="/admin/stats"
           element={
-            isAuthenticated && isAdmin
+            isAuthenticated
               ? <AdminStats />
-              : <Navigate to="/home" replace />
+              : <Navigate to="/" replace />
           }
         />
 
