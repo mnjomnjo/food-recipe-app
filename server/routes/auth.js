@@ -122,8 +122,7 @@ router.post("/login", async (req, res) => {
         message: "Invalid credentials",
       });
     }
-
-    // Create access token......................................
+      // Create access token
     const accessToken = jwt.sign(
       {
         id: user._id,
@@ -134,6 +133,8 @@ router.post("/login", async (req, res) => {
         expiresIn: "15m",
       }
     );
+
+   
 
     // Create refresh token
     const refreshToken = jwt.sign(

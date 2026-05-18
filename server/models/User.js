@@ -22,11 +22,11 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
 
-    // User role (authorization)
+    // User role
     role: {
       type: String,
-      enum: ["user", "admin"], // Allowed values
-      default: "user", // Default role
+      enum: ["user", "admin"],
+      default: "user",
     },
 
     // User favorite recipes
@@ -47,8 +47,6 @@ const userSchema = new mongoose.Schema(
       type: Date,
     },
   },
-
-  // Automatically add createdAt and updatedAt
   { timestamps: true }
 );
 

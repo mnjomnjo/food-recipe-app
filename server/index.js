@@ -34,8 +34,8 @@ app.use(helmet());
 
 // Prevent too many requests from the same IP
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests
+  windowMs: 15 * 60 * 1000,
+  max: 100,
   message: "Too many requests, please try again later.",
 });
 
@@ -46,7 +46,7 @@ app.use(limiter);
 // General Middlewares
 // =========================
 
-// Enable Cross-Origin Resource Sharing
+// Enable CORS
 app.use(cors());
 
 // Parse JSON request bodies
@@ -71,7 +71,7 @@ app.use("/api/recipes", recipeRoute);
 // Protected Routes
 // =========================
 
-// Only authenticated users can access this route
+// Protected test route
 app.get("/api/protected", verifyToken, (req, res) => {
   res.json({
     message: "You are authorized",
@@ -79,7 +79,7 @@ app.get("/api/protected", verifyToken, (req, res) => {
   });
 });
 
-// Admin-only route
+// Admin-only test route
 app.get("/api/admin", verifyToken, verifyAdmin, (req, res) => {
   res.json({
     message: "Welcome Admin 🔥",
@@ -89,21 +89,15 @@ app.get("/api/admin", verifyToken, verifyAdmin, (req, res) => {
 // Admin statistics route
 app.get("/api/stats", verifyToken, verifyAdmin, async (req, res) => {
   try {
-
-    // Count total users
     const totalUsers = await User.countDocuments();
 
-    // Count total recipes
     const totalRecipes = await Recipe.countDocuments();
 
-    // Send statistics response
     res.status(200).json({
       totalUsers,
       totalRecipes,
     });
-
   } catch (err) {
-
     res.status(500).json({
       message: "Error fetching statistics",
       error: err.message,
@@ -136,10 +130,8 @@ app.get("/", (req, res) => {
 // Start Server
 // =========================
 
-// Define server port
 const PORT = process.env.PORT || 5000;
 
-// Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
