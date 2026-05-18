@@ -14,6 +14,7 @@ function Home() {
   const [ratings, setRatings] = useState({});
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   // LOAD DATA
   useEffect(() => {
@@ -25,6 +26,7 @@ function Home() {
   const fetchRecipes = async () => {
     try {
       setLoading(true);
+      setError("");
 
       const token = localStorage.getItem("token");
 
@@ -40,6 +42,8 @@ function Home() {
       setRecipes(res.data);
     } catch (err) {
       console.log(err);
+
+      setError("Failed to load recipes");
 
       toast.error("Failed to load recipes");
     } finally {
@@ -276,16 +280,28 @@ function Home() {
           )}
         </div>
 
-        {/* LOADING */}
-        {loading ? (
+        {/* ERROR */}
+        {error ? (
+          <h2 className="error-text">
+            {error}
+          </h2>
+        ) : loading ? (
+
+          /* LOADING */
           <h2 className="loading-text">
             Loading recipes...
           </h2>
+
         ) : filteredRecipes.length === 0 ? (
+
+          /* EMPTY */
           <h2 className="empty-text">
             No recipes found
           </h2>
+
         ) : (
+
+          /* RECIPES */
           <div className="recipes-grid">
             {filteredRecipes.map((recipe) => (
               <div
