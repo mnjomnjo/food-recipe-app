@@ -4,7 +4,7 @@
   padding: 40px 20px;
   text-align: center;
   font-family: "Poppins", sans-serif;
-  overflow-x: hidden;
+  
 }
 
 .add-container h2 {
@@ -131,9 +131,4 @@
   .add-form {
     padding: 18px;
   }
-}
-
-/* PREVENT HORIZONTAL SCROLL */
-body {
-  overflow-x: hidden;
 }

@@ -7,6 +7,7 @@ import Navbar from "../components/Navbar";
 import "./AdminStats.css";
 
 function AdminStats() {
+
   const [stats, setStats] = useState(null);
 
   const [isAdmin, setIsAdmin] = useState(false);
@@ -20,14 +21,18 @@ function AdminStats() {
   }, []);
 
   useEffect(() => {
+
     if (isAdmin) {
       fetchStats();
     }
+
   }, [isAdmin]);
 
   // CHECK ADMIN ROLE
   const checkAdmin = () => {
+
     try {
+
       const token = localStorage.getItem("token");
 
       if (!token) {
@@ -38,20 +43,27 @@ function AdminStats() {
       const decoded = jwtDecode(token);
 
       if (decoded.role === "admin") {
+
         setIsAdmin(true);
+
       } else {
+
         setLoading(false);
       }
 
     } catch (err) {
+
       console.log(err);
+
       setLoading(false);
     }
   };
 
   // FETCH STATS
   const fetchStats = async () => {
+
     try {
+
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
@@ -66,27 +78,34 @@ function AdminStats() {
       setStats(res.data);
 
     } catch (err) {
+
       console.log(err);
 
       setError("Failed to load statistics");
 
     } finally {
+
       setLoading(false);
     }
   };
 
   // ACCESS DENIED
   if (!loading && !isAdmin) {
+
     return (
       <>
         <Navbar />
 
         <div className="stats-container">
+
           <div className="message-card">
+
             <h2>Access Denied</h2>
 
             <p>Admin access only.</p>
+
           </div>
+
         </div>
       </>
     );
@@ -94,14 +113,19 @@ function AdminStats() {
 
   // LOADING
   if (loading) {
+
     return (
       <>
         <Navbar />
 
         <div className="stats-container">
+
           <div className="message-card">
+
             <h2>Loading statistics...</h2>
+
           </div>
+
         </div>
       </>
     );
@@ -109,14 +133,19 @@ function AdminStats() {
 
   // ERROR
   if (error) {
+
     return (
       <>
         <Navbar />
 
         <div className="stats-container">
+
           <div className="message-card">
+
             <h2>{error}</h2>
+
           </div>
+
         </div>
       </>
     );
@@ -129,37 +158,55 @@ function AdminStats() {
       <div className="stats-container">
 
         <div className="stats-header">
+
           <h1>Admin Dashboard</h1>
 
           <p>
             Monitor platform statistics and application activity.
           </p>
+
         </div>
 
         <div className="stats-grid">
 
           <div className="stat-card">
+
             <h2>{stats.totalRecipes}</h2>
 
             <p>Total Recipes</p>
+
           </div>
 
           <div className="stat-card">
+
             <h2>{stats.totalUsers}</h2>
 
             <p>Total Users</p>
+
           </div>
 
           <div className="stat-card">
-            <h2>24</h2>
+
+            <h2>{stats.totalFavorites}</h2>
 
             <p>Total Favorites</p>
+
           </div>
 
           <div className="stat-card">
-            <h2>4.8</h2>
+
+            <h2>{stats.averageRating?.toFixed(1)}</h2>
 
             <p>Average Rating</p>
+
+          </div>
+
+          <div className="stat-card">
+
+            <h2>{stats.totalRatedRecipes}</h2>
+
+            <p>Rated Recipes</p>
+
           </div>
 
         </div>

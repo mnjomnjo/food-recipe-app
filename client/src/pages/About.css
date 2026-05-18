@@ -9,7 +9,7 @@
   padding: 40px 20px;
 
   font-family: "Poppins", sans-serif;
-  overflow-x: hidden;
+  
 }
 
 /* CARD */
@@ -146,9 +146,4 @@
   .about-section h2 {
     font-size: 22px;
   }
-}
-
-/* PREVENT HORIZONTAL SCROLL */
-body {
-  overflow-x: hidden;
 }
