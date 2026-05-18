@@ -16,38 +16,6 @@ import About from "./pages/About";
 import AdminStats from "./pages/AdminStats";
 
 function App() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-
-    try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-
-      console.log(data);
-
-      // save token
-      if (data.accessToken) {
-        localStorage.setItem("token", data.accessToken);
-        alert("Login successful");
-      } else {
-        alert("Login failed");
-      }
-
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
   return (
     <Router>
       {/* Toast Container */}
@@ -78,7 +46,10 @@ function App() {
           element={<Favorites />}
         />
 
-        <Route path="/about" element={<About />} />
+        <Route
+          path="/about"
+          element={<About />}
+        />
 
         <Route
           path="/admin/stats"

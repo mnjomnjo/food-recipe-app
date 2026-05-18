@@ -1,57 +1,83 @@
 .add-container {
   min-height: 100vh;
   background: #c8ae89;
-
   padding: 40px 20px;
   text-align: center;
+  font-family: "Poppins", sans-serif;
+  overflow-x: hidden;
 }
 
 .add-container h2 {
   margin-bottom: 30px;
-  font-size: 36px;
+  font-size: 48px;
+  color: #222;
+  font-weight: 700;
 }
 
+/* FORM */
 .add-form {
-  max-width: 500px;
+  max-width: 550px;
   margin: auto;
 
   background: white;
-  padding: 30px;
+  padding: 35px;
 
-  border-radius: 20px;
+  border-radius: 24px;
 
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 18px;
+
+  transition: 0.3s;
 }
 
+/* INPUTS */
 .add-form input,
 .add-form textarea {
-  padding: 14px;
+  width: 100%;
+  box-sizing: border-box;
 
-  border-radius: 10px;
+  padding: 15px 16px;
+
+  border-radius: 14px;
   border: 1px solid #ddd;
 
   font-size: 15px;
+  font-family: inherit;
+
+  outline: none;
+
+  transition: 0.3s;
 }
 
+/* FOCUS */
+.add-form input:focus,
+.add-form textarea:focus {
+  border-color: #ff5e62;
+  box-shadow: 0 0 10px rgba(255, 94, 98, 0.2);
+}
+
+/* TEXTAREA */
 .add-form textarea {
   resize: none;
-  min-height: 100px;
+  min-height: 120px;
 }
 
+/* BUTTON */
 .add-form button {
   background: #ff5e62;
   color: white;
 
   border: none;
-  padding: 14px;
+  padding: 15px;
 
-  border-radius: 10px;
+  border-radius: 14px;
 
-  font-size: 16px;
+  font-size: 17px;
+  font-weight: 600;
+
   cursor: pointer;
 
   transition: 0.3s;
@@ -59,4 +85,55 @@
 
 .add-form button:hover {
   background: #ff3d44;
+  transform: translateY(-2px);
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .add-container {
+    padding: 30px 15px;
+  }
+
+  .add-container h2 {
+    font-size: 32px;
+    margin-bottom: 20px;
+  }
+
+  .add-form {
+    padding: 22px;
+    border-radius: 18px;
+    gap: 15px;
+  }
+
+  .add-form input,
+  .add-form textarea {
+    font-size: 14px;
+    padding: 14px;
+  }
+
+  .add-form textarea {
+    min-height: 100px;
+  }
+
+  .add-form button {
+    width: 100%;
+    padding: 14px;
+    font-size: 15px;
+  }
+}
+
+/* EXTRA SMALL DEVICES */
+@media (max-width: 480px) {
+  .add-container h2 {
+    font-size: 26px;
+  }
+
+  .add-form {
+    padding: 18px;
+  }
+}
+
+/* PREVENT HORIZONTAL SCROLL */
+body {
+  overflow-x: hidden;
 }

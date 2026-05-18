@@ -86,10 +86,13 @@
 
 /*  RESPONSIVE  */
 @media (max-width: 768px) {
+
   .navbar {
     flex-direction: column;
-    gap: 15px;
-    padding: 20px;
+    align-items: center;
+
+    padding: 15px;
+    gap: 12px;
   }
 
   .logo {
@@ -97,11 +100,21 @@
   }
 
   .nav-links {
+    display: flex;
     justify-content: center;
-    gap: 15px;
+    flex-wrap: wrap;
+
+    gap: 12px;
+  }
+
+  .nav-links a {
+    font-size: 14px;
   }
 
   .logout-btn {
-    width: 100%;
+    padding: 8px 14px;
+    font-size: 14px;
+    width: auto;
   }
+
 }

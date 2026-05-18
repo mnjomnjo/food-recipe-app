@@ -1,134 +1,498 @@
-/* GLOBAL */
-.auth-container {
-  display: flex;
-  height: 100vh;
-  font-family: 'Poppins', sans-serif;
+/* =========================
+   GLOBAL
+========================= */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* LEFT PANEL */
+body {
+  font-family: 'Poppins', sans-serif;
+  overflow-x: hidden;
+}
+
+.auth-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* =========================
+   LEFT PANEL
+========================= */
+
 .left-panel {
   flex: 1;
-  background: linear-gradient(135deg, #ec560a, #66d3e7);
+
+  background:
+    linear-gradient(
+      135deg,
+      #ec560a,
+      #66d3e7
+    );
+
   color: white;
-  padding: 60px;
+
   position: relative;
+
+  padding: 60px;
+
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: flex-start;
+
+  overflow: hidden;
 }
 
-/*  APP NAME */
+/* GLOW EFFECTS */
+
+.left-panel::before {
+  content: "";
+
+  position: absolute;
+
+  width: 320px;
+  height: 320px;
+
+  border-radius: 50%;
+
+  background: rgba(255,255,255,0.12);
+
+  top: -120px;
+  right: -120px;
+
+  filter: blur(20px);
+}
+
+.left-panel::after {
+  content: "";
+
+  position: absolute;
+
+  width: 220px;
+  height: 220px;
+
+  border-radius: 50%;
+
+  background: rgba(255,255,255,0.08);
+
+  bottom: -90px;
+  left: -90px;
+
+  filter: blur(15px);
+}
+
+/* =========================
+   APP NAME
+========================= */
+
 .app-name {
   position: absolute;
-  top: 25px;
-  left: 35px;
 
-  font-size: 75px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
+  top: 35px;
+  left: 40px;
 
-  font-family: 'Montserrat', sans-serif; 
+  font-size: 68px;
+  font-weight: 800;
 
-  background: linear-gradient(45deg, #ffffff, #ffe6d5);
+  font-family: 'Montserrat', sans-serif;
+
+  letter-spacing: 1px;
+
+  background: linear-gradient(
+    45deg,
+    #ffffff,
+    #ffe9da
+  );
+
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 
-  text-shadow: 0 3px 10px rgba(0,0,0,0.2);
+  text-shadow: 0 4px 14px rgba(0,0,0,0.18);
+
+  z-index: 2;
 }
 
-/* TEXT */
+/* =========================
+   LEFT TEXT
+========================= */
+
 .left-panel h2 {
-  font-size: 36px;
-  margin-bottom: 10px;
+  font-size: 52px;
+  font-weight: 700;
+
+  margin-bottom: 15px;
+
+  line-height: 1.1;
+
+  z-index: 2;
 }
 
 .left-panel p {
-  margin-bottom: 20px;
-  opacity: 0.9;
-  line-height: 1.5;
+  font-size: 18px;
+
+  line-height: 1.7;
+
+  max-width: 420px;
+
+  margin-bottom: 30px;
+
+  opacity: 0.95;
+
+  z-index: 2;
 }
 
-/* BUTTON (LEFT) */
+/* =========================
+   LEFT BUTTON
+========================= */
+
 .ghost-btn {
-  background: transparent;
   border: 2px solid white;
-  padding: 10px 25px;
+
+  background: transparent;
+
   color: white;
+
+  padding: 13px 30px;
+
+  border-radius: 40px;
+
+  font-size: 16px;
+  font-weight: 600;
+
   cursor: pointer;
-  border-radius: 25px;
+
   transition: all 0.3s ease;
+
+  z-index: 2;
 }
 
 .ghost-btn:hover {
   background: white;
+
   color: #ff5e62;
+
+  transform: translateY(-2px);
+
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
 }
 
-/* RIGHT PANEL */
+/* =========================
+   RIGHT PANEL
+========================= */
+
 .right-panel {
   flex: 1;
+
+  background: #f7f8fc;
+
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #f8f9fb;
+
+  padding: 40px;
 }
 
-/* FORM CARD */
+/* =========================
+   FORM CARD
+========================= */
+
 .form-box {
+  width: 100%;
+  max-width: 430px;
+
   background: white;
-  padding: 40px;
-  border-radius: 15px;
-  width: 320px;
-  text-align: center;
-  box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+
+  padding: 45px 35px;
+
+  border-radius: 28px;
+
+  box-shadow:
+    0 10px 25px rgba(0,0,0,0.08),
+    0 20px 40px rgba(0,0,0,0.08);
+
   animation: fadeIn 0.6s ease;
 }
 
 .form-box h2 {
-  margin-bottom: 20px;
+  text-align: center;
+
+  margin-bottom: 28px;
+
+  font-size: 38px;
+
+  color: #222;
 }
 
-/* INPUT */
+/* =========================
+   INPUTS
+========================= */
+
 .form-box input {
   width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  border-radius: 8px;
+
+  padding: 15px 16px;
+
+  margin-bottom: 16px;
+
+  border-radius: 14px;
+
   border: 1px solid #ddd;
-  transition: all 0.3s ease;
+
+  background: #fafafa;
+
+  font-size: 15px;
+
+  transition: 0.3s;
 }
 
 .form-box input:focus {
-  border-color: #ff5e62;
   outline: none;
-  box-shadow: 0 0 5px rgba(255, 94, 98, 0.3);
+
+  border-color: #ff5e62;
+
+  background: white;
+
+  box-shadow: 0 0 0 4px rgba(255,94,98,0.12);
 }
 
-/* BUTTON (RIGHT) */
+/* =========================
+   MAIN BUTTON
+========================= */
+
 .form-box button {
   width: 100%;
-  padding: 12px;
-  background: linear-gradient(135deg, #ff9966, #ff5e62);
+
   border: none;
+
+  padding: 15px;
+
+  margin-top: 8px;
+
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ff9966,
+      #ff5e62
+    );
+
   color: white;
+
+  font-size: 16px;
+  font-weight: 600;
+
   cursor: pointer;
-  border-radius: 8px;
-  margin-top: 10px;
+
   transition: 0.3s;
 }
 
 .form-box button:hover {
-  opacity: 0.9;
+  transform: translateY(-2px);
+
+  box-shadow: 0 10px 20px rgba(255,94,98,0.25);
 }
 
-/* ANIMATION */
+/* =========================
+   ANIMATION
+========================= */
+
 @keyframes fadeIn {
+
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(25px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* =========================
+   TABLET
+========================= */
+
+@media (max-width: 992px) {
+
+  .app-name {
+    font-size: 54px;
+  }
+
+  .left-panel h2 {
+    font-size: 42px;
+  }
+
+  .left-panel p {
+    font-size: 16px;
+  }
+
+  .form-box {
+    max-width: 390px;
+  }
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 768px) {
+
+  .auth-container {
+    flex-direction: column;
+  }
+
+  /* LEFT */
+
+  .left-panel {
+    width: 100%;
+
+    min-height: 36vh;
+
+    padding: 28px 20px 35px;
+
+    text-align: center;
+
+    align-items: center;
+    justify-content: center;
+  }
+
+  .app-name {
+    position: static;
+
+    font-size: 50px;
+
+    margin-bottom: 20px;
+
+    text-align: center;
+  }
+
+  .left-panel h2 {
+    font-size: 32px;
+
+    margin-bottom: 10px;
+  }
+
+  .left-panel p {
+    font-size: 14px;
+
+    line-height: 1.5;
+
+    max-width: 290px;
+
+    margin-bottom: 22px;
+  }
+
+  .ghost-btn {
+    padding: 10px 22px;
+
+    font-size: 14px;
+  }
+
+  /* RIGHT */
+
+  .right-panel {
+    width: 100%;
+
+    padding: 22px 15px 35px;
+
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+  /* FORM */
+
+  .form-box {
+    width: 100%;
+    max-width: 360px;
+
+    padding: 30px 22px;
+
+    border-radius: 24px;
+
+    margin-top: -10px;
+  }
+
+  .form-box h2 {
+    font-size: 30px;
+
+    margin-bottom: 22px;
+  }
+
+  .form-box input {
+    padding: 13px;
+
+    font-size: 14px;
+
+    margin-bottom: 14px;
+  }
+
+  .form-box button {
+    padding: 13px;
+
+    font-size: 15px;
+  }
+}
+
+/* =========================
+   SMALL MOBILE
+========================= */
+
+@media (max-width: 480px) {
+
+  .left-panel {
+    min-height: 34vh;
+
+    padding: 24px 18px 30px;
+  }
+
+  .app-name {
+    font-size: 42px;
+
+    margin-bottom: 16px;
+  }
+
+  .left-panel h2 {
+    font-size: 28px;
+  }
+
+  .left-panel p {
+    font-size: 13px;
+
+    max-width: 240px;
+  }
+
+  .ghost-btn {
+    padding: 9px 20px;
+
+    font-size: 13px;
+  }
+
+  .right-panel {
+    padding: 18px 12px 30px;
+  }
+
+  .form-box {
+    padding: 26px 18px;
+
+    border-radius: 22px;
+  }
+
+  .form-box h2 {
+    font-size: 26px;
+  }
+
+  .form-box input {
+    padding: 12px;
+  }
+
+  .form-box button {
+    padding: 12px;
   }
 }

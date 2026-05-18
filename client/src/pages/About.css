@@ -7,49 +7,148 @@
   align-items: center;
 
   padding: 40px 20px;
+
+  font-family: "Poppins", sans-serif;
+  overflow-x: hidden;
 }
 
+/* CARD */
 .about-card {
   background: white;
 
-  max-width: 800px;
+  max-width: 850px;
   width: 100%;
 
-  padding: 40px;
+  padding: 45px;
 
-  border-radius: 25px;
+  border-radius: 28px;
 
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.1);
 
   text-align: center;
+
+  transition: 0.3s;
 }
 
+.about-card:hover {
+  transform: translateY(-4px);
+}
+
+/* TITLE */
 .about-card h1 {
-  margin-bottom: 20px;
-  font-size: 42px;
+  margin-bottom: 25px;
+
+  font-size: 48px;
+  font-weight: 700;
+
+  color: #222;
+
+  line-height: 1.3;
 }
 
+/* DESCRIPTION */
 .about-card p {
   color: #555;
-  line-height: 1.8;
+
+  line-height: 1.9;
   font-size: 18px;
+
+  margin-bottom: 10px;
 }
 
+/* SECTION */
 .about-section {
-  margin-top: 35px;
+  margin-top: 40px;
 }
 
+/* SECTION TITLES */
 .about-section h2 {
-  margin-bottom: 15px;
+  margin-bottom: 18px;
+
   color: #ff5e62;
+
+  font-size: 30px;
+  font-weight: 700;
 }
 
+/* LIST */
 .about-section ul {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
+/* LIST ITEMS */
 .about-section li {
-  margin: 10px 0;
-  font-size: 17px;
+  margin: 14px 0;
+
+  font-size: 18px;
+  color: #444;
+
+  transition: 0.3s;
+}
+
+.about-section li:hover {
+  color: #ff5e62;
+  transform: translateX(3px);
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .about-container {
+    padding: 30px 15px;
+    align-items: flex-start;
+  }
+
+  .about-card {
+    padding: 30px 22px;
+    border-radius: 22px;
+  }
+
+  .about-card h1 {
+    font-size: 34px;
+    margin-bottom: 18px;
+  }
+
+  .about-card p {
+    font-size: 16px;
+    line-height: 1.8;
+  }
+
+  .about-section {
+    margin-top: 30px;
+  }
+
+  .about-section h2 {
+    font-size: 24px;
+  }
+
+  .about-section li {
+    font-size: 15px;
+    margin: 10px 0;
+  }
+}
+
+/* EXTRA SMALL DEVICES */
+@media (max-width: 480px) {
+  .about-card {
+    padding: 24px 18px;
+  }
+
+  .about-card h1 {
+    font-size: 28px;
+  }
+
+  .about-card p {
+    font-size: 15px;
+  }
+
+  .about-section h2 {
+    font-size: 22px;
+  }
+}
+
+/* PREVENT HORIZONTAL SCROLL */
+body {
+  overflow-x: hidden;
 }
