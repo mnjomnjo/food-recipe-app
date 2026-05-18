@@ -14,8 +14,13 @@ const recipeSchema = new mongoose.Schema(
       required: true,
     },
 
-    // ADD IMAGE FIELD
+    // Recipe image
     image: {
+      type: String,
+    },
+
+    // Recipe category
+    category: {
       type: String,
     },
 
