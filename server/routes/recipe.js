@@ -1,9 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
+
 const Recipe = require("../models/Recipe");
 const User = require("../models/User");
-const verifyToken = require("../middleware/authMiddleware");
+
+const {
+  verifyToken,
+  verifyAdmin,
+} = require("../middleware/authMiddleware");
 
 // Create recipe
 router.post("/", verifyToken, async (req, res) => {
@@ -14,6 +19,7 @@ router.post("/", verifyToken, async (req, res) => {
     });
 
     const savedRecipe = await newRecipe.save();
+
     res.status(201).json(savedRecipe);
   } catch (err) {
     res.status(500).json({
@@ -23,15 +29,21 @@ router.post("/", verifyToken, async (req, res) => {
   }
 });
 
-// Get statistics for user's recipes
+// User statistics
 router.get("/stats", verifyToken, async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const totalRecipes = await Recipe.countDocuments({ user: userId });
+    const totalRecipes = await Recipe.countDocuments({
+      user: userId,
+    });
 
     const avgCaloriesResult = await Recipe.aggregate([
-      { $match: { user: new mongoose.Types.ObjectId(userId) } },
+      {
+        $match: {
+          user: new mongoose.Types.ObjectId(userId),
+        },
+      },
       {
         $group: {
           _id: null,
@@ -75,6 +87,65 @@ router.get("/stats", verifyToken, async (req, res) => {
   }
 });
 
+// Admin statistics
+router.get(
+  "/admin/stats",
+  verifyToken,
+  verifyAdmin,
+  async (req, res) => {
+    try {
+      const totalUsers = await User.countDocuments();
+
+      const totalRecipes = await Recipe.countDocuments();
+
+      const usersWithFavorites = await User.find({}, "favorites");
+
+      const totalFavorites = usersWithFavorites.reduce((sum, user) => {
+        return sum + user.favorites.length;
+      }, 0);
+
+      const ratingStats = await Recipe.aggregate([
+        {
+          $group: {
+            _id: null,
+
+            averageRating: {
+              $avg: "$rating",
+            },
+
+            totalRatedRecipes: {
+              $sum: {
+                $cond: [{ $gt: ["$rating", 0] }, 1, 0],
+              },
+            },
+          },
+        },
+      ]);
+
+      res.status(200).json({
+        totalUsers,
+        totalRecipes,
+        totalFavorites,
+
+        averageRating:
+          ratingStats.length > 0
+            ? Math.round(ratingStats[0].averageRating * 10) / 10
+            : 0,
+
+        totalRatedRecipes:
+          ratingStats.length > 0
+            ? ratingStats[0].totalRatedRecipes
+            : 0,
+      });
+    } catch (err) {
+      res.status(500).json({
+        message: "Error fetching admin statistics",
+        error: err.message,
+      });
+    }
+  }
+);
+
 // Get my favorite recipes
 router.get("/favorites/my", verifyToken, async (req, res) => {
   try {
@@ -89,21 +160,38 @@ router.get("/favorites/my", verifyToken, async (req, res) => {
   }
 });
 
-// Get all recipes with optional search, calorie filter, and category filter
+// Get all recipes
 router.get("/", async (req, res) => {
   try {
     const { search, calories, category } = req.query;
 
     const query = {};
 
+    // Search filter
     if (search) {
       query.$or = [
-        { title: { $regex: search, $options: "i" } },
-        { description: { $regex: search, $options: "i" } },
-        { ingredients: { $regex: search, $options: "i" } },
+        {
+          title: {
+            $regex: search,
+            $options: "i",
+          },
+        },
+        {
+          description: {
+            $regex: search,
+            $options: "i",
+          },
+        },
+        {
+          ingredients: {
+            $regex: search,
+            $options: "i",
+          },
+        },
       ];
     }
 
+    // Calories filter
     if (calories === "low") {
       query.calories = { $lt: 300 };
     } else if (calories === "medium") {
@@ -112,11 +200,17 @@ router.get("/", async (req, res) => {
       query.calories = { $gt: 600 };
     }
 
+    // Category filter
     if (category) {
-      query.category = { $regex: category, $options: "i" };
+      query.category = {
+        $regex: category,
+        $options: "i",
+      };
     }
 
-    const recipes = await Recipe.find(query).sort({ createdAt: -1 });
+    const recipes = await Recipe.find(query).sort({
+      createdAt: -1,
+    });
 
     res.status(200).json(recipes);
   } catch (err) {
@@ -127,7 +221,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Rate a recipe
+// Rate recipe
 router.post("/:id/rate", verifyToken, async (req, res) => {
   try {
     const { rating } = req.body;
@@ -147,6 +241,7 @@ router.post("/:id/rate", verifyToken, async (req, res) => {
     }
 
     recipe.rating = rating;
+
     await recipe.save();
 
     res.status(200).json({
@@ -161,7 +256,7 @@ router.post("/:id/rate", verifyToken, async (req, res) => {
   }
 });
 
-// Add recipe to favorites
+// Add favorite
 router.post("/:id/favorite", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -173,6 +268,7 @@ router.post("/:id/favorite", verifyToken, async (req, res) => {
     }
 
     user.favorites.push(req.params.id);
+
     await user.save();
 
     res.status(200).json({
@@ -187,7 +283,7 @@ router.post("/:id/favorite", verifyToken, async (req, res) => {
   }
 });
 
-// Remove recipe from favorites
+// Remove favorite
 router.delete("/:id/favorite", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -253,8 +349,12 @@ router.put("/:id", verifyToken, async (req, res) => {
 
     const updatedRecipe = await Recipe.findByIdAndUpdate(
       req.params.id,
-      { $set: req.body },
-      { new: true }
+      {
+        $set: req.body,
+      },
+      {
+        new: true,
+      }
     );
 
     res.status(200).json(updatedRecipe);

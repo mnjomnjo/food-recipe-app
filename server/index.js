@@ -4,7 +4,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
-const verifyToken = require("./middleware/authMiddleware");
+const { verifyToken } = require("./middleware/authMiddleware");
 const recipeRoute = require("./routes/recipe");
 
 // Initialize Express app
