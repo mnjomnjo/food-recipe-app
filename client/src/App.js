@@ -20,7 +20,7 @@ import AdminStats from "./pages/AdminStats";
 
 function App() {
 
-  // CHECK TOKEN
+  // GET TOKEN
   const token = localStorage.getItem("token");
 
   // CHECK LOGIN
@@ -32,13 +32,18 @@ function App() {
   try {
 
     if (token) {
+
       const decoded = jwtDecode(token);
 
-      isAdmin = decoded.role === "admin";
+      isAdmin =
+        decoded.role === "admin";
     }
 
   } catch (err) {
+
     console.log(err);
+
+    localStorage.removeItem("token");
   }
 
   return (
@@ -54,7 +59,7 @@ function App() {
           path="/"
           element={
             isAuthenticated
-              ? <Navigate to="/home" />
+              ? <Navigate to="/home" replace />
               : <Login />
           }
         />
@@ -64,7 +69,7 @@ function App() {
           path="/register"
           element={
             isAuthenticated
-              ? <Navigate to="/home" />
+              ? <Navigate to="/home" replace />
               : <Register />
           }
         />
@@ -75,17 +80,17 @@ function App() {
           element={
             isAuthenticated
               ? <Home />
-              : <Navigate to="/" />
+              : <Navigate to="/" replace />
           }
         />
 
-        {/* DETAILS */}
+        {/* RECIPE DETAILS */}
         <Route
           path="/recipe/:id"
           element={
             isAuthenticated
               ? <RecipeDetails />
-              : <Navigate to="/" />
+              : <Navigate to="/" replace />
           }
         />
 
@@ -95,7 +100,7 @@ function App() {
           element={
             isAuthenticated
               ? <AddRecipe />
-              : <Navigate to="/" />
+              : <Navigate to="/" replace />
           }
         />
 
@@ -105,7 +110,7 @@ function App() {
           element={
             isAuthenticated
               ? <Favorites />
-              : <Navigate to="/" />
+              : <Navigate to="/" replace />
           }
         />
 
@@ -115,7 +120,7 @@ function App() {
           element={
             isAuthenticated
               ? <About />
-              : <Navigate to="/" />
+              : <Navigate to="/" replace />
           }
         />
 
@@ -125,7 +130,7 @@ function App() {
           element={
             isAuthenticated && isAdmin
               ? <AdminStats />
-              : <Navigate to="/home" />
+              : <Navigate to="/home" replace />
           }
         />
 

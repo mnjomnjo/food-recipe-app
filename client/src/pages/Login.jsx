@@ -1,13 +1,14 @@
 import { useState } from "react";
+
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+
+import { Link } from "react-router-dom";
+
 import toast from "react-hot-toast";
 
 import "./Auth.css";
 
 function Login() {
-
-  const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
 
@@ -36,9 +37,12 @@ function Login() {
         res.data.token
       );
 
-      toast.success("Login successful ✅");
+      toast.success(
+        "Login successful ✅"
+      );
 
-      navigate("/home");
+      // REFRESH APP
+      window.location.href = "/home";
 
     } catch (err) {
 
@@ -46,7 +50,7 @@ function Login() {
 
       toast.error(
         err.response?.data?.message ||
-        "Login failed"
+        "Login failed ❌"
       );
 
     } finally {
@@ -72,9 +76,11 @@ function Login() {
         </p>
 
         <Link to="/register">
+
           <button className="ghost-btn">
             Sign Up
           </button>
+
         </Link>
 
       </div>
@@ -113,12 +119,15 @@ function Login() {
             type="submit"
             disabled={loading}
           >
+
             {loading
               ? "Logging in..."
               : "Login"}
+
           </button>
 
         </form>
+
       </div>
     </div>
   );
