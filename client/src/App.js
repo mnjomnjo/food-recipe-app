@@ -34,6 +34,7 @@ function App() {
     if (token) {
 
       const decoded = jwtDecode(token);
+    //console.log(decoded);
 
       isAdmin =
         decoded.role === "admin";
