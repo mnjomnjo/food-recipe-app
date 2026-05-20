@@ -14,17 +14,28 @@ const {
 // ================= CREATE RECIPE =================
 router.post("/", verifyToken, async (req, res) => {
   try {
+
+    // Create new recipe
     const newRecipe = new Recipe({
       ...req.body,
       user: req.user.id,
     });
 
+    // Save recipe to database
     const savedRecipe = await newRecipe.save();
 
-    res.status(201).json(savedRecipe);
+    // Success response
+    res.status(201).json({
+      success: true,
+      message: "Recipe created successfully",
+      data: savedRecipe,
+    });
 
   } catch (err) {
+
+    // Server error response
     res.status(500).json({
+      success: false,
       message: "Error creating recipe",
       error: err.message,
     });
@@ -232,37 +243,48 @@ router.get("/", async (req, res) => {
   }
 });
 
-
 // ================= RATE RECIPE =================
 router.post("/:id/rate", verifyToken, async (req, res) => {
   try {
+
     const { rating } = req.body;
 
+    // Validate rating value
     if (rating < 1 || rating > 5) {
       return res.status(400).json({
+        success: false,
         message: "Rating must be between 1 and 5",
       });
     }
 
+    // Find recipe by ID
     const recipe = await Recipe.findById(req.params.id);
 
+    // Check if recipe exists
     if (!recipe) {
       return res.status(404).json({
+        success: false,
         message: "Recipe not found",
       });
     }
 
+    // Update recipe rating
     recipe.rating = rating;
 
     await recipe.save();
 
+    // Success response
     res.status(200).json({
+      success: true,
       message: "Recipe rated successfully",
-      recipe,
+      data: recipe,
     });
 
   } catch (err) {
+
+    // Server error response
     res.status(500).json({
+      success: false,
       message: "Error rating recipe",
       error: err.message,
     });
@@ -298,31 +320,38 @@ router.post("/:id/favorite", verifyToken, async (req, res) => {
   }
 });
 
-
 // ================= REMOVE FAVORITE =================
 router.delete("/:id/favorite", verifyToken, async (req, res) => {
   try {
+
+    // Find current user
     const user = await User.findById(req.user.id);
 
+    // Remove recipe from favorites
     user.favorites = user.favorites.filter(
       (fav) => fav.toString() !== req.params.id
     );
 
+    // Save updated favorites
     await user.save();
 
+    // Success response
     res.status(200).json({
+      success: true,
       message: "Recipe removed from favorites",
-      favorites: user.favorites,
+      data: user.favorites,
     });
 
   } catch (err) {
+
+    // Server error response
     res.status(500).json({
+      success: false,
       message: "Error removing favorite",
       error: err.message,
     });
   }
 });
-
 
 // ================= DELETE RECIPE =================
 router.delete("/:id", verifyToken, async (req, res) => {
