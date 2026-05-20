@@ -1,22 +1,57 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+
+import { useNavigate } from "react-router-dom";
+
+import axios from "axios";
+
 import toast from "react-hot-toast";
+
 import "./Navbar.css";
 
 function Navbar() {
+
   const navigate = useNavigate();
 
   // LOGOUT
-  const handleLogout = () => {
-    localStorage.removeItem("token");
+  const handleLogout = async () => {
 
-    toast.success("Logged out successfully ✅");
+    try {
 
-    window.location.href = "/";
+      // Call backend logout route
+      await axios.post(
+        "http://localhost:5000/api/auth/logout"
+      );
+
+      // Remove token from localStorage
+      localStorage.removeItem("token");
+
+      // Remove user data
+      localStorage.removeItem("user");
+
+      // Success notification
+      toast.success(
+        "Logged out successfully ✅"
+      );
+
+      // Redirect to login page
+      navigate("/");
+
+    } catch (err) {
+
+      console.log(err);
+
+      toast.error(
+        "Logout failed ❌"
+      );
+    }
   };
 
   return (
     <nav className="navbar">
-      <h2 className="logo">MyRecipes</h2>
+
+      <h2 className="logo">
+        MyRecipes
+      </h2>
 
       <div className="nav-links">
 

@@ -24,6 +24,7 @@ function Login() {
 
       setLoading(true);
 
+      // Send login request
       const res = await axios.post(
         "http://localhost:5000/api/auth/login",
         {
@@ -32,22 +33,31 @@ function Login() {
         }
       );
 
+      // Save JWT token
       localStorage.setItem(
         "token",
         res.data.token
       );
 
+      // Save logged in user data
+      localStorage.setItem(
+        "user",
+        JSON.stringify(res.data.user)
+      );
+
+      // Success notification
       toast.success(
         "Login successful ✅"
       );
 
-      // REFRESH APP
+      // Redirect user
       window.location.href = "/home";
 
     } catch (err) {
 
       console.log(err);
 
+      // Error notification
       toast.error(
         err.response?.data?.message ||
         "Login failed ❌"
@@ -62,7 +72,7 @@ function Login() {
   return (
     <div className="auth-container">
 
-      {/* LEFT */}
+      {/* LEFT PANEL */}
       <div className="left-panel">
 
         <h1 className="app-name">
@@ -85,7 +95,7 @@ function Login() {
 
       </div>
 
-      {/* RIGHT */}
+      {/* RIGHT PANEL */}
       <div className="right-panel">
 
         <form
