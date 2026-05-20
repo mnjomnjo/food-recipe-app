@@ -19,6 +19,7 @@ router.post("/register", async (req, res) => {
     // Validate required fields
     if (!username || !email || !password) {
       return res.status(400).json({
+        success: false,
         message: "All fields are required",
       });
     }
@@ -26,6 +27,7 @@ router.post("/register", async (req, res) => {
     // Validate email format
     if (!email.includes("@")) {
       return res.status(400).json({
+        success: false,
         message: "Invalid email format",
       });
     }
@@ -40,6 +42,7 @@ router.post("/register", async (req, res) => {
 
     if (!passwordRegex.test(password)) {
       return res.status(400).json({
+        success: false,
         message:
           "Password must contain at least 6 characters, one uppercase letter, and one number",
       });
@@ -50,6 +53,7 @@ router.post("/register", async (req, res) => {
 
     if (existingUser) {
       return res.status(400).json({
+        success: false,
         message: "User already exists",
       });
     }
@@ -57,7 +61,7 @@ router.post("/register", async (req, res) => {
     // Generate salt for password hashing
     const salt = await bcrypt.genSalt(10);
 
-    // Hash password .........................................
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Create new user
@@ -70,15 +74,17 @@ router.post("/register", async (req, res) => {
     // Save user to database
     await newUser.save();
 
-    // Send success response
+    // Success response
     res.status(201).json({
+      success: true,
       message: "User registered successfully",
     });
 
   } catch (err) {
 
-    // Handle server errors
+    // Server error response
     res.status(500).json({
+      success: false,
       message: "Server error",
       error: err.message,
     });
@@ -86,7 +92,6 @@ router.post("/register", async (req, res) => {
   }
 
 });
-
 
 // ================= LOGIN =================
 router.post("/login", async (req, res) => {
@@ -99,6 +104,7 @@ router.post("/login", async (req, res) => {
     // Validate required fields
     if (!email || !password) {
       return res.status(400).json({
+        success: false,
         message: "Email and password are required",
       });
     }
@@ -109,6 +115,7 @@ router.post("/login", async (req, res) => {
     // Check if user exists
     if (!user) {
       return res.status(400).json({
+        success: false,
         message: "User not found",
       });
     }
@@ -119,10 +126,12 @@ router.post("/login", async (req, res) => {
     // Check if password is correct
     if (!isMatch) {
       return res.status(400).json({
+        success: false,
         message: "Invalid credentials",
       });
     }
-      // Create access token
+
+    // Create access token
     const accessToken = jwt.sign(
       {
         id: user._id,
@@ -133,8 +142,6 @@ router.post("/login", async (req, res) => {
         expiresIn: "15m",
       }
     );
-
-   
 
     // Create refresh token
     const refreshToken = jwt.sign(
@@ -153,19 +160,27 @@ router.post("/login", async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    // Send login response
+    // Success response
     res.status(200).json({
+      success: true,
       message: "Login successful",
       token: accessToken,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
     });
 
   } catch (err) {
 
-    // Handle server errors
+    // Server error response
     res.status(500).json({
+      success: false,
       message: "Server error",
       error: err.message,
     });
@@ -173,8 +188,6 @@ router.post("/login", async (req, res) => {
   }
 
 });
-
-
 // ================= REFRESH TOKEN =================
 router.post("/refresh", (req, res) => {
 
@@ -184,6 +197,7 @@ router.post("/refresh", (req, res) => {
   // Check if refresh token exists
   if (!refreshToken) {
     return res.status(401).json({
+      success: false,
       message: "Refresh token not found",
     });
   }
@@ -194,6 +208,7 @@ router.post("/refresh", (req, res) => {
     // Check if refresh token is invalid
     if (err) {
       return res.status(403).json({
+        success: false,
         message: "Invalid refresh token",
       });
     }
@@ -210,15 +225,16 @@ router.post("/refresh", (req, res) => {
       }
     );
 
-    // Send new access token
+    // Success response
     res.status(200).json({
+      success: true,
+      message: "Token refreshed successfully",
       token: newAccessToken,
     });
 
   });
 
 });
-
 
 // ================= LOGOUT =================
 router.post("/logout", (req, res) => {
@@ -230,8 +246,9 @@ router.post("/logout", (req, res) => {
     secure: process.env.NODE_ENV === "production",
   });
 
-  // Send logout response
+  // Success response
   res.status(200).json({
+    success: true,
     message: "Logged out successfully",
   });
 

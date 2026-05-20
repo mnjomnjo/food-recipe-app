@@ -37,6 +37,19 @@ function App() {
       const decoded = jwtDecode(token);
     //console.log(decoded);
 
+      // Check token expiration
+      const currentTime = Date.now() / 1000;
+
+      if (decoded.exp < currentTime) {
+
+        localStorage.removeItem("token");
+
+        localStorage.removeItem("user");
+
+        window.location.href = "/";
+      }
+
+      // Check admin role
       isAdmin =
         decoded.role === "admin";
     }
@@ -46,6 +59,8 @@ function App() {
     console.log(err);
 
     localStorage.removeItem("token");
+
+    localStorage.removeItem("user");
   }
 
   return (

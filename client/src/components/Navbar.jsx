@@ -2,6 +2,8 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { jwtDecode } from "jwt-decode";
 
+import axios from "axios";
+
 import toast from "react-hot-toast";
 
 import "./Navbar.css";
@@ -34,15 +36,37 @@ function Navbar() {
   }
 
   // LOGOUT
-  const handleLogout = () => {
+  const handleLogout = async () => {
 
-    localStorage.removeItem("token");
+    try {
 
-    toast.success(
-      "Logged out successfully ✅"
-    );
+      // Call backend logout route
+      await axios.post(
+        "http://localhost:5000/api/auth/logout"
+      );
 
-    window.location.href = "/";
+      // Remove token from localStorage
+      localStorage.removeItem("token");
+
+      // Remove user data
+      localStorage.removeItem("user");
+
+      // Success notification
+      toast.success(
+        "Logged out successfully ✅"
+      );
+
+      // Redirect to login page
+      navigate("/");
+
+    } catch (err) {
+
+      console.log(err);
+
+      toast.error(
+        "Logout failed ❌"
+      );
+    }
   };
 
   return (
