@@ -8,6 +8,8 @@ import Navbar from "../components/Navbar";
 
 import toast from "react-hot-toast";
 
+import Footer from "../components/Footer";
+
 import "./Home.css";
 
 function Home() {
@@ -600,6 +602,7 @@ function Home() {
           </div>
         )}
       </div>
+      <Footer />
     </>
   );
 }
