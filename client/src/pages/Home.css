@@ -473,3 +473,17 @@
 
   text-transform: capitalize;
 }
+.empty-state {
+  text-align: center;
+  padding: 50px 20px;
+}
+
+.empty-state h2 {
+  color: #ff6b6b;
+  margin-bottom: 10px;
+}
+
+.empty-state p {
+  color: #555;
+  font-size: 16px;
+}

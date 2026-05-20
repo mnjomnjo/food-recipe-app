@@ -472,9 +472,12 @@ function Home() {
 
         ) : filteredRecipes.length === 0 ? (
 
-          <h2 className="empty-text">
-            No recipes found
-          </h2>
+          <div className="empty-state">
+            <h2>🍽️ No recipes found</h2>
+            <p>
+              Try another search or change the calorie filter.
+            </p>
+          </div>
 
         ) : (
 
