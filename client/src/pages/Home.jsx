@@ -331,7 +331,8 @@ function Home() {
       ? Math.round(
           recipes.reduce(
             (sum, r) =>
-              sum + r.calories,
+             // sum + r.calories,
+              sum + Number(r.calories || 0),
             0
           ) / recipes.length
         )
