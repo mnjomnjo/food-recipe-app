@@ -17,6 +17,7 @@ import AddRecipe from "./pages/AddRecipe";
 import Favorites from "./pages/Favorites";
 import About from "./pages/About";
 import AdminStats from "./pages/AdminStats";
+import NotFound from "./pages/NotFound";
 
 function App() {
 
@@ -34,7 +35,21 @@ function App() {
     if (token) {
 
       const decoded = jwtDecode(token);
+    //console.log(decoded);
 
+      // Check token expiration
+      const currentTime = Date.now() / 1000;
+
+      if (decoded.exp < currentTime) {
+
+        localStorage.removeItem("token");
+
+        localStorage.removeItem("user");
+
+        window.location.href = "/";
+      }
+
+      // Check admin role
       isAdmin =
         decoded.role === "admin";
     }
@@ -44,6 +59,8 @@ function App() {
     console.log(err);
 
     localStorage.removeItem("token");
+
+    localStorage.removeItem("user");
   }
 
   return (
@@ -127,13 +144,14 @@ function App() {
         {/* ADMIN ONLY */}
         <Route
           path="/admin/stats"
+          
           element={
             isAuthenticated && isAdmin
               ? <AdminStats />
               : <Navigate to="/home" replace />
           }
         />
-
+      <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );

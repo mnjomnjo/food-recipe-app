@@ -447,3 +447,43 @@
     height: 190px;
   }
 }
+
+.category-wrapper {
+
+  margin-top: 4px;
+
+  margin-bottom: 16px;
+}
+
+.category-tag {
+
+  display: inline-block;
+
+  padding: 6px 14px;
+
+  background: #ffefef;
+
+  color: #ff5e62;
+
+  border-radius: 20px;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  text-transform: capitalize;
+}
+.empty-state {
+  text-align: center;
+  padding: 50px 20px;
+}
+
+.empty-state h2 {
+  color: #ff6b6b;
+  margin-bottom: 10px;
+}
+
+.empty-state p {
+  color: #555;
+  font-size: 16px;
+}
