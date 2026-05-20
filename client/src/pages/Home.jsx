@@ -253,10 +253,15 @@ function Home() {
   };
 
   // DELETE
-  const deleteRecipe = async (
-    id
-  ) => {
-
+  //const deleteRecipe = async (
+   // id
+  //) => {
+    
+  const deleteRecipe = async (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this recipe?"
+    );
+    if (!confirmDelete) return;
     try {
 
       const token =
