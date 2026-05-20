@@ -334,6 +334,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
     // Check if recipe exists
     if (!recipe) {
       return res.status(404).json({
+           success: false,
         message: "Recipe not found",
       });
     }
@@ -344,6 +345,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
       req.user.role !== "admin"
     ) {
       return res.status(403).json({
+         success: false,
         message: "Unauthorized access",
       });
     }
@@ -352,32 +354,38 @@ router.delete("/:id", verifyToken, async (req, res) => {
     await recipe.deleteOne();
 
     res.status(200).json({
+       success: true,
       message: "Recipe deleted successfully",
     });
 
   } catch (err) {
     res.status(500).json({
+      success: false,
       message: "Error deleting recipe",
       error: err.message,
     });
   }
 });
 
-
 // ================= UPDATE RECIPE =================
 router.put("/:id", verifyToken, async (req, res) => {
   try {
+
+    // Find recipe by ID and owner
     const recipe = await Recipe.findOne({
       _id: req.params.id,
       user: req.user.id,
     });
 
+    // Check if recipe exists or user is unauthorized
     if (!recipe) {
       return res.status(404).json({
+        success: false,
         message: "Recipe not found or unauthorized",
       });
     }
 
+    // Update recipe
     const updatedRecipe = await Recipe.findByIdAndUpdate(
       req.params.id,
       {
@@ -388,10 +396,18 @@ router.put("/:id", verifyToken, async (req, res) => {
       }
     );
 
-    res.status(200).json(updatedRecipe);
+    // Success response
+    res.status(200).json({
+      success: true,
+      message: "Recipe updated successfully",
+      data: updatedRecipe,
+    });
 
   } catch (err) {
+
+    // Server error response
     res.status(500).json({
+      success: false,
       message: "Error updating recipe",
       error: err.message,
     });
