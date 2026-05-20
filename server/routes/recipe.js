@@ -327,17 +327,28 @@ router.delete("/:id/favorite", verifyToken, async (req, res) => {
 // ================= DELETE RECIPE =================
 router.delete("/:id", verifyToken, async (req, res) => {
   try {
-    const recipe = await Recipe.findOne({
-      _id: req.params.id,
-      user: req.user.id,
-    });
 
+    // Find recipe by ID
+    const recipe = await Recipe.findById(req.params.id);
+
+    // Check if recipe exists
     if (!recipe) {
       return res.status(404).json({
-        message: "Recipe not found or unauthorized",
+        message: "Recipe not found",
       });
     }
 
+    // Check recipe ownership or admin role
+    if (
+      recipe.user.toString() !== req.user.id &&
+      req.user.role !== "admin"
+    ) {
+      return res.status(403).json({
+        message: "Unauthorized access",
+      });
+    }
+
+    // Delete recipe
     await recipe.deleteOne();
 
     res.status(200).json({
